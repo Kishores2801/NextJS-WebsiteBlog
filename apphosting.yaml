@@ -8,16 +8,29 @@ runConfig:
   # memoryMiB: 512
 
 # Environment variables and secrets.
-# env:
-  # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
-  #   availability:
-  #     - BUILD
-  #     - RUNTIME
-
-  # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+env:
+  - variable: NEXT_PUBLIC_SANITY_PROJECT_ID
+    value: upj9dth5
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_SANITY_DATASET
+    value: production
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: https://my-portfolio-blog.web.app # Fallback/Initial, change after deployment
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: SANITY_API_READ_TOKEN
+    value: skw5U0WyfGLHROPhC9RjmnrsE9K2lsk78QpnsGUEWLkV6dvcdngYqVUfCF4Hp0SidyJfAa6tLynGAB0Zg58OM9ld6nQfNTDXMr274Bg3y14Q3D57Wd5lNuiUY82oou83IfbIXKOUOq68s09tguxOVbBB3aKAzBa7BmYIPbHFGT0uS6FLosQA
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: SANITY_PREVIEW_SECRET
+    value: my-secret
+    availability:
+      - BUILD
+      - RUNTIME
