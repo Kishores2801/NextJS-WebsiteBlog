@@ -20,7 +20,7 @@ env:
       - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_SITE_URL
-    value: https://my-portfolio-blog.web.app # Fallback/Initial, change after deployment
+    value: https://web-app--kishore-portfolio-blog-ac1c7.us-east4.hosted.app
     availability:
       - BUILD
       - RUNTIME
@@ -29,7 +29,7 @@ env:
     availability:
       - BUILD
       - RUNTIME
-  - variable: SANITY_PREVIEW_SECRET
+  - variable: NEXT_PUBLIC_SANITY_PREVIEW_SECRET
     value: my-secret
     availability:
       - BUILD

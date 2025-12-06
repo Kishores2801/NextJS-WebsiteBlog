@@ -30,7 +30,7 @@ export async function sanityFetch<QueryResponse>({
     // - 'no-store' for drafts (always fresh)
     // - 'force-cache' or 'next: { revalidate }' for prod (handled by client config)
     ...(isDraftMode && {
-      token: process.env.SANITY_API_TOKEN,
+      token: process.env.SANITY_API_READ_TOKEN,
       perspective: 'drafts',
       stega: true,
     }),
@@ -39,5 +39,11 @@ export async function sanityFetch<QueryResponse>({
       // 🕒 Revalidate every 60s in prod, 0s in draft
       revalidate: isDraftMode ? 0 : 60, 
     },
+  }).catch((error) => {
+    console.error("❌ Sanity Fetch Error:", {
+      query,
+      params,
+    });
+    throw error;
   })
 }

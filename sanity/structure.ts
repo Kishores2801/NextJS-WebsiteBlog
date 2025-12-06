@@ -31,7 +31,7 @@ export const structure: StructureResolver = (S) =>
                     .options({
                       url: (doc: any) => {
                       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-                      const secret = process.env.SANITY_PREVIEW_SECRET || 'my-secret'
+                      const secret = process.env.NEXT_PUBLIC_SANITY_PREVIEW_SECRET || 'my-secret'
                       const slug = doc?.slug?.current
                       return slug
                         ? `${baseUrl}/api/preview?secret=${secret}&slug=${slug}`
