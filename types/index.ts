@@ -63,6 +63,7 @@ export interface Settings {
   showCarousel?: boolean
   showCertifications?: boolean
   showTestimonials?: boolean
+  primaryAccentColor?: string
 }
 
 // 📝 Blog Post
