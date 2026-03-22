@@ -30,6 +30,9 @@ export interface Project {
   categories?: { title: string; slug: { current: string } }[]
   date?: string
   features?: string[]
+  challenge?: string
+  action?: string
+  impact?: string
 }
 
 // 🛠️ Skill

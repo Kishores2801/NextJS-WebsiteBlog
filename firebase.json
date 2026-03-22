@@ -1,15 +1,4 @@
 {
-  "hosting": {
-    "source": "hosting",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "frameworksBackend": {
-      "region": "us-central1"
-    }
-  },
   "apphosting": {
     "backendId": "web-app",
     "rootDir": "/",
@@ -17,8 +6,7 @@
       "node_modules",
       ".git",
       "firebase-debug.log",
-      "firebase-debug.*.log",
-      "functions"
+      "firebase-debug.*.log"
     ]
   }
 }

@@ -50,6 +50,29 @@ export const projectType = defineType({
       description: 'Full case study: Problem, Solution, Tech Stack, and Outcome.',
     }),
 
+    // 🌟 STAR Method Fields
+    defineField({
+      name: 'challenge',
+      title: 'The Challenge (Situation/Task)',
+      type: 'text',
+      rows: 4,
+      description: 'Describe the problem or context of the project.',
+    }),
+    defineField({
+      name: 'action',
+      title: 'The Action (Approach)',
+      type: 'text',
+      rows: 4,
+      description: 'What specific steps did you take to solve the challenge?',
+    }),
+    defineField({
+      name: 'impact',
+      title: 'The Impact (Result/Metrics)',
+      type: 'text',
+      rows: 4,
+      description: 'What were the measurable outcomes? E.g., increased conversion by 20%.',
+    }),
+
     // 🖼️ Main Image
     defineField({
       name: 'mainImage',

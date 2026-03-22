@@ -50,7 +50,10 @@ export default async function ProjectPage({ params }: Props) {
         links,
         categories[]->{ title, slug },
         date,
-        features
+        features,
+        challenge,
+        action,
+        impact
       }
     `,
     params: { slug },
@@ -105,7 +108,7 @@ export default async function ProjectPage({ params }: Props) {
       {project.mainImage?.asset?.url && (
         <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-16 bg-muted">
           <Image
-            src={urlFor(project.mainImage).width(1920).height(1080).url()}
+            src={urlFor(project.mainImage).width(1920).height(1080).quality(100).url()}
             alt={project.mainImage.alt || project.title}
             fill
             className="object-cover"
@@ -120,7 +123,37 @@ export default async function ProjectPage({ params }: Props) {
         
         {/* Main Content */}
         <div className="prose prose-lg dark:prose-invert max-w-none">
-          <CustomPortableText value={project.description} />
+          {/* STAR Method Section */}
+          {(project.challenge || project.action || project.impact) && (
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-12 not-prose">
+              {project.challenge && (
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <h3 className="text-xl font-bold mb-3 flex items-center text-[var(--accent)]">
+                    <span className="text-2xl mr-2">🎯</span> The Challenge
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{project.challenge}</p>
+                </div>
+              )}
+              {project.action && (
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <h3 className="text-xl font-bold mb-3 flex items-center text-[var(--accent)]">
+                    <span className="text-2xl mr-2">⚡</span> The Action
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{project.action}</p>
+                </div>
+              )}
+              {project.impact && (
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <h3 className="text-xl font-bold mb-3 flex items-center text-[var(--accent)]">
+                    <span className="text-2xl mr-2">🚀</span> The Impact
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{project.impact}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {project.description && <CustomPortableText value={project.description} />}
         </div>
 
         {/* Sidebar */}

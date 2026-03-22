@@ -60,12 +60,6 @@ export default async function Home() {
 
   return (
     <div className="bg-background text-foreground font-sans transition-colors duration-300 overflow-x-hidden">
-      {/* 
-        Pass settings to NavBar so it doesn't need to fetch client-side.
-        (Note: NavBar needs to be updated to accept props)
-      */}
-      <NavBar settings={settings} />
-
       <main className="flex flex-col gap-16 sm:gap-24 px-4 sm:px-6 md:px-12 lg:px-16 py-10 max-w-7xl mx-auto w-full">
         
         {/* ========================= HERO ========================= */}

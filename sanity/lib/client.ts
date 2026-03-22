@@ -5,8 +5,14 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: true, // ✅ use CDN for faster published reads
+  useCdn: process.env.NODE_ENV === 'production',
   stega: {
-    studioUrl: '/studio', // 👈 Required for stega / visual editing
+    studioUrl: '/studio',
   },
+})
+
+export const tokenClient = client.withConfig({
+  token: process.env.SANITY_API_READ_TOKEN,
+  useCdn: false,
+  stega: true,
 })

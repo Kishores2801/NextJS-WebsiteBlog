@@ -14,6 +14,13 @@ export default defineType({
       type: "boolean",
       initialValue: true,
     }),
+    defineField({
+      name: "primaryAccentColor",
+      title: "Primary Accent Color (Hex)",
+      type: "string",
+      description: "e.g., #3b82f6 for blue. This will be injected as a CSS variable.",
+      initialValue: "#3b82f6",
+    }),
 
     // ===============================
     // ABOUT SECTION

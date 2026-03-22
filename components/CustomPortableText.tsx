@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { PortableText, PortableTextComponents, PortableTextMarkComponentProps } from '@portabletext/react'
 import { urlFor } from '@/sanity/lib/image'
 import Image from 'next/image'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { atomOneDark, atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import { useTheme } from 'next-themes'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
@@ -28,10 +26,12 @@ const CustomPortableText = ({ value }: { value: any }) => {
           <figure className="my-10 text-center w-full group">
             <div className="overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 hover:scale-[1.01]">
               <Image
-                src={urlFor(value).width(2400).fit('max').auto('format').url()}
+                src={urlFor(value).width(2400).quality(100).fit('max').auto('format').url()}
                 alt={value.alt || 'Image'}
                 width={1200}
                 height={700}
+                quality={100}
+                unoptimized
                 className="object-cover w-full h-auto max-h-[80vh]"
               />
             </div>
@@ -45,7 +45,7 @@ const CustomPortableText = ({ value }: { value: any }) => {
       },
 
       codeBlock: ({ value }: { value: any }) => (
-        <div className="my-10 rounded-xl overflow-hidden shadow-2xl border border-[var(--border)] bg-[#282c34]">
+        <div className="not-prose my-10 rounded-xl overflow-hidden shadow-2xl border border-[var(--border)] bg-[#282c34]">
           <div className="flex items-center justify-between px-4 py-2 bg-[#21252b] border-b border-white/10">
             <div className="flex space-x-2">
               <div className="w-3 h-3 rounded-full bg-red-500/80" />
@@ -58,21 +58,10 @@ const CustomPortableText = ({ value }: { value: any }) => {
               </span>
             )}
           </div>
-          <SyntaxHighlighter
-            language={value.language || 'javascript'}
-            style={atomOneDark}
-            showLineNumbers
-            wrapLongLines
-            customStyle={{
-              margin: 0,
-              padding: '1.5rem',
-              background: 'transparent',
-              fontSize: '0.9rem',
-              lineHeight: '1.6',
-            }}
-          >
-            {value.code || ''}
-          </SyntaxHighlighter>
+          <div 
+            className="p-6 text-sm overflow-x-auto text-gray-100 [&>pre]:!bg-transparent [&>pre]:m-0 [&>pre]:p-0 [&_code]:!bg-transparent" 
+            dangerouslySetInnerHTML={{ __html: value.html || `<pre><code>${value.code}</code></pre>` }} 
+          />
         </div>
       ),
 

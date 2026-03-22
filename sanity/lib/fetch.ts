@@ -1,7 +1,6 @@
 import { createClient, type QueryParams } from 'next-sanity'
 import { draftMode } from 'next/headers'
-import { client } from './client'
-import { tokenClient } from '@/lib/tokenClient' // Ensure this exists or create it
+import { client, tokenClient } from './client'
 
 /**
  * 🛠️ sanityFetch

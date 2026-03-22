@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import NavBar from "@/components/NavBar";
+import FloatingNav from "@/components/FloatingNav";
 import Footer from "@/components/footer";
-import JsonLd from "@/components/JsonLd"; // 👈 Import JsonLd
+import JsonLd from "@/components/JsonLd"; 
+import { sanityFetch } from "@/sanity/lib/fetch";
+import { Settings } from "@/types";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,21 +50,29 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await sanityFetch<Settings>({
+    query: `*[_type == "siteSettings"][0]`,
+    tags: ["siteSettings"],
+  }).catch(() => null);
+
+  const accentColor = settings?.primaryAccentColor || "#3b82f6";
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={{ '--accent': accentColor } as React.CSSProperties}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground transition-colors duration-300`}
+        suppressHydrationWarning
       >
         <JsonLd />
         {/* Wrap everything inside ThemeProvider to prevent hydration mismatch */}
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <NavBar />
-          <main className="min-h-screen flex flex-col">{children}</main>
+          <FloatingNav settings={settings || undefined} />
+          <main className="min-h-screen flex flex-col pb-32">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

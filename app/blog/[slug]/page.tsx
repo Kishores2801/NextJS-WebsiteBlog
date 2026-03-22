@@ -6,6 +6,7 @@ import CustomPortableText from '@/components/CustomPortableText'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Post } from '@/types'
+import { codeToHtml } from 'shiki'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -103,17 +104,19 @@ export default async function BlogPost({ params }: Props) {
         {post.mainImage?.asset?.url && (
           <div className="relative w-full aspect-[2/1] rounded-2xl overflow-hidden mb-12 shadow-lg">
             <Image
-              src={urlFor(post.mainImage).width(1600).height(800).url()}
+              src={urlFor(post.mainImage).width(1600).height(800).quality(100).url()}
               alt={post.mainImage.alt || post.title}
               fill
               className="object-cover"
               priority
+              quality={100}
+              unoptimized
             />
           </div>
         )}
 
         <div className="prose prose-lg dark:prose-invert max-w-none">
-          <CustomPortableText value={addIdsToHeadings(post.body || [])} />
+          <CustomPortableText value={await preHighlightCodeBlocks(addIdsToHeadings(post.body || []))} />
         </div>
 
         <hr className="my-12 border-border" />
@@ -138,4 +141,25 @@ function addIdsToHeadings(blocks: any[]) { // eslint-disable-line @typescript-es
     }
     return block
   })
+}
+
+// Helper to pre-render Shiki highlighting on the server
+async function preHighlightCodeBlocks(blocks: any[]) {
+  if (!blocks) return []
+  return Promise.all(
+    blocks.map(async (block) => {
+      if (block._type === 'codeBlock' && block.code) {
+        try {
+          const html = await codeToHtml(block.code.trim(), {
+            lang: block.language || 'javascript',
+            theme: 'one-dark-pro',
+          })
+          return { ...block, html }
+        } catch (e) {
+          console.error('Shiki error', e)
+        }
+      }
+      return block
+    })
+  )
 }

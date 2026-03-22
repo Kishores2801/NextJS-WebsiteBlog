@@ -113,7 +113,7 @@ export default function CareerTimeline() {
   };
 
   return (
-    <section id="Career" className="w-full h-auto py-12 overflow-hidden relative flex flex-col justify-center">
+    <section id="Career" className="w-full h-auto pt-12 pb-20 sm:pb-12 overflow-hidden relative flex flex-col justify-center">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10">
         <div className="text-left mb-10 pl-4 lg:pl-0">
           <h2 className="text-3xl sm:text-4xl font-bold text-[var(--primary)] mb-2">
@@ -147,8 +147,8 @@ export default function CareerTimeline() {
           </div>
         </div>
 
-        {/* Manual Controls for Testing */}
-        <div className="absolute bottom-4 right-4 flex items-center gap-2 z-50">
+        {/* Manual Controls */}
+        <div className="absolute -bottom-6 sm:bottom-4 right-4 sm:right-4 flex items-center gap-2 z-50">
           <button 
             onClick={handleRestart}
             className="px-3 py-1 bg-[var(--card)] border border-[var(--border)] rounded-full text-xs hover:bg-[var(--primary)] hover:text-white transition-colors"
