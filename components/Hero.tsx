@@ -41,9 +41,9 @@ export default function Hero({ data }: { data?: HeroData }) {
         transition={{ duration: 0.6 }}
       >
         <h1 className="leading-tight flex flex-col gap-2">
-          <span className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground transition-colors">
+          {/* <span className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground transition-colors">
             Architecting High-Performance Web Experiences.
-          </span>
+          </span> */}
           <span className="text-xl md:text-2xl text-muted-foreground font-medium mt-2">
             Hi, I'm <span className="text-[var(--accent)]">{firstName}</span> {lastName}.
           </span>
