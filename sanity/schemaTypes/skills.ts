@@ -39,6 +39,7 @@ export const skillType = defineType({
           { title: "Cloud & DevOps", value: "cloud" },
           { title: "Data Science", value: "datascience" },
           { title: "Machine Learning", value: "ml" },
+          { title: "Data Visualization", value: "ml" },
           { title: "Tools & Platforms", value: "tools" },
           { title: "Other (Custom)", value: "other" }, // ⭐ NEW OPTION
         ],

@@ -67,7 +67,7 @@ export default function Skills({ data = [] }: { data?: Skill[] }) {
                 {skills.map((skill) => (
                   <div 
                     key={skill._id} 
-                    className="flex items-center gap-1.5 bg-secondary/10 px-2.5 py-1.5 rounded-md border border-transparent hover:border-primary/20 transition-colors"
+                    className="flex items-center gap-2 bg-secondary/10 px-2.5 py-1.5 rounded-md border border-transparent hover:border-primary/20 transition-colors min-w-fit"
                   >
                     {skill.icon?.asset?.url && (
                       <div className="relative w-4 h-4 shrink-0">
@@ -80,7 +80,8 @@ export default function Skills({ data = [] }: { data?: Skill[] }) {
                         />
                       </div>
                     )}
-                    <span className="text-xs font-medium text-foreground/80">
+                    {/* whitespace-nowrap ensures "Next JS" stays on one line */}
+                    <span className="text-xs font-medium text-foreground/80 whitespace-nowrap">
                       {skill.title}
                     </span>
                   </div>
