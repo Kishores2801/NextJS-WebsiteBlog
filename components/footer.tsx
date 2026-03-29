@@ -7,15 +7,7 @@ export default function Footer() {
       <div className="flex flex-col items-center gap-4">
         {/* 🌐 Social Links */}
         <div className="flex gap-6 justify-center">
-          <a
-            href="https://github.com/Kishores2801"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[var(--color-primary)] transition"
-            aria-label="GitHub"
-          >
-            <Github size={22} />
-          </a>
+          
 
           <a
             href="https://www.linkedin.com/in/kishore-shan"
@@ -27,7 +19,24 @@ export default function Footer() {
             <Linkedin size={22} />
           </a>
 
-          {/* <a
+          <a
+            href="mailto:kishoreshan2801@gmail.com"
+            className="hover:text-[#FF6B6B] transition"
+            aria-label="Email"
+          >
+            <Mail size={22} />
+          </a>
+          <a
+            href="https://github.com/Kishores2801"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[var(--color-primary)] transition"
+            aria-label="GitHub"
+          >
+            <Github size={22} />
+          </a>
+
+          <a
             href="https://www.fiverr.com/users/kishore_data"
             target="_blank"
             rel="noopener noreferrer"
@@ -35,10 +44,10 @@ export default function Footer() {
             aria-label="Fiverr"
           >
             <SiFiverr size={22} />
-          </a> */}
+          </a>
 
           <a
-            href="https://www.upwork.com/freelancers/~YOUR_UPWORK_ID"
+            href="https://www.upwork.com/freelancers/~01ed5351b55a5e345c"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-[#6FDA44] transition"
@@ -57,13 +66,7 @@ export default function Footer() {
             <Instagram size={22} />
           </a>
 
-          <a
-            href="mailto:kishoreshan2801@gmail.com"
-            className="hover:text-[#FF6B6B] transition"
-            aria-label="Email"
-          >
-            <Mail size={22} />
-          </a>
+          
         </div>
 
         {/* 🧾 Copyright */}

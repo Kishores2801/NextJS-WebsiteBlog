@@ -31,7 +31,7 @@ export default function Hero({ data }: { data?: HeroData }) {
   const lastName = name?.split(" ").slice(1).join(" ") || "Name";
 
   return (
-    <section className="w-full flex flex-col-reverse md:flex-row items-center justify-between gap-10 md:gap-18">
+    <section className="w-full flex flex-col-reverse md:flex-row items-center justify-between gap-6 md:gap-12">
       
       {/* 📝 Left Column: Text Content */}
       <motion.div
@@ -40,7 +40,7 @@ export default function Hero({ data }: { data?: HeroData }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h1 className="leading-tight flex flex-col gap-2">
+        <h1 className="leading-tight flex flex-col gap-1">
           {/* <span className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground transition-colors">
             Architecting High-Performance Web Experiences.
           </span> */}
@@ -49,7 +49,7 @@ export default function Hero({ data }: { data?: HeroData }) {
           </span>
         </h1>
 
-        <div className="relative h-[3.5rem] overflow-hidden text-xl md:text-2xl text-secondary font-semibold">
+        <div className="relative h-[3.5rem] overflow text-xl md:text-2xl text-secondary font-semibold">
           {typewriterTexts?.length ? (
             <AnimatePresence mode="popLayout">
               <motion.div
@@ -58,7 +58,7 @@ export default function Hero({ data }: { data?: HeroData }) {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -40, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="absolute w-full"
+                className="w-[120%]"
               >
                 {typewriterTexts[index]}
               </motion.div>
@@ -69,12 +69,12 @@ export default function Hero({ data }: { data?: HeroData }) {
         </div>
 
         {tagline && (
-          <p className="text-lg text-muted-foreground leading-relaxed mt-2">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             {tagline}
           </p>
         )}
 
-        <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-4">
+        <div className="flex flex-wrap justify-center md:justify-start gap-4">
           <Button
             borderRadius="1.75rem"
             className="bg-background text-foreground border-neutral-200 dark:border-slate-800 font-semibold"
@@ -100,8 +100,8 @@ export default function Hero({ data }: { data?: HeroData }) {
         <div
           className="
             relative 
-            w-[280px] h-[280px] 
-            md:w-[400px] md:h-[400px]
+            w-[300px] h-[300px] 
+            md:w-[450px] md:h-[450px]
             rounded-full 
             overflow-hidden 
             border-4 border-background 
