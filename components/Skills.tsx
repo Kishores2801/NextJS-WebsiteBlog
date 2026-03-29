@@ -71,13 +71,14 @@ export default function Skills({ data = [] }: { data?: Skill[] }) {
                   >
                     {skill.icon?.asset?.url && (
                       <div className="relative w-4 h-4 shrink-0">
-                        <Image
-                          src={urlFor(skill.icon).width(32).height(32).url()}
-                          alt={skill.title}
-                          fill
-                          className="object-contain"
-                          unoptimized
-                        />
+                      <Image
+                        src={urlFor(skill.icon).width(32).height(32).url()}
+                        alt={skill.title}
+                        width={32}
+                        height={32}
+                        className="object-contain"
+                        unoptimized
+                    />
                       </div>
                     )}
                     {/* whitespace-nowrap ensures "Next JS" stays on one line */}

@@ -66,11 +66,12 @@ export default function Certifications() {
             {cert.logo && (
               <div className="relative w-16 h-16 mb-4">
                 <Image
-                  src={urlFor(cert.logo).width(200).height(200).url()}
-                  alt={cert.title}
-                  fill
-                  className="object-contain"
-                />
+  src={urlFor(cert.logo).width(200).height(200).url()}
+  alt={cert.title}
+  width={200}
+  height={200}
+  className="object-contain"
+/>
               </div>
             )}
 

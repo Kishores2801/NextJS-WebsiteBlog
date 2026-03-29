@@ -1,5 +1,5 @@
-import { Github, Linkedin, Instagram } from "lucide-react"
-import { SiFiverr } from "react-icons/si"
+import { Github, Linkedin, Instagram, Mail } from "lucide-react";
+import { SiFiverr, SiUpwork } from "react-icons/si";
 
 export default function Footer() {
   return (
@@ -27,7 +27,7 @@ export default function Footer() {
             <Linkedin size={22} />
           </a>
 
-          <a
+          {/* <a
             href="https://www.fiverr.com/users/kishore_data"
             target="_blank"
             rel="noopener noreferrer"
@@ -35,6 +35,16 @@ export default function Footer() {
             aria-label="Fiverr"
           >
             <SiFiverr size={22} />
+          </a> */}
+
+          <a
+            href="https://www.upwork.com/freelancers/~YOUR_UPWORK_ID"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#6FDA44] transition"
+            aria-label="Upwork"
+          >
+            <SiUpwork size={22} />
           </a>
 
           <a
@@ -46,14 +56,24 @@ export default function Footer() {
           >
             <Instagram size={22} />
           </a>
+
+          <a
+            href="mailto:kishoreshan2801@gmail.com"
+            className="hover:text-[#FF6B6B] transition"
+            aria-label="Email"
+          >
+            <Mail size={22} />
+          </a>
         </div>
 
         {/* 🧾 Copyright */}
         <p className="text-xs text-gray-500 dark:text-gray-400 flex flex-col md:flex-row gap-2 items-center">
           <span>© {new Date().getFullYear()} Kishore. All rights reserved.</span>
-          <a href="/sitemap.xml" className="hover:text-primary transition-colors">Sitemap</a>
+          <a href="/sitemap.xml" className="hover:text-primary transition-colors">
+            Sitemap
+          </a>
         </p>
       </div>
     </footer>
-  )
+  );
 }
