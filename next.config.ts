@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
         hostname: 'cdn.sanity.io',
       },
     ],
+    qualities: [25, 50, 75, 100],
   },
 
   output: 'standalone',

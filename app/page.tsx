@@ -14,49 +14,53 @@ import { Settings, HeroData, Project, Skill } from "@/types";
  * Fetches all data server-side for better SEO and performance (LCP).
  */
 export default async function Home() {
-  // 1. Fetch Site Settings
-  const settings = await sanityFetch<Settings>({
-    query: `*[_type == "siteSettings"][0]`,
-    tags: ["siteSettings"],
-  });
+  // Fetch data in parallel to avoid "waterfall" delays
+  const [settings, heroData, projects, skills] = await Promise.all([
+    // 1. Fetch Site Settings
+    sanityFetch<Settings>({
+      query: `*[_type == "siteSettings"][0]`,
+      tags: ["siteSettings"],
+    }),
 
-  // 2. Fetch Hero Data
-  const heroData = await sanityFetch<HeroData>({
-    query: `*[_type == "hero"][0]{
-      name,
-      typewriterTexts,
-      tagline,
-      profileImage{ asset->{url}, alt }
-    }`,
-    tags: ["hero"],
-  });
+    // 2. Fetch Hero Data
+    sanityFetch<HeroData>({
+      query: `*[_type == "hero"][0]{
+        name,
+        typewriterTexts,
+        tagline,
+        profileImage{ asset->{url}, alt }
+      }`,
+      tags: ["hero"],
+    }),
 
-  // 3. Fetch Featured Projects
-  const projects = await sanityFetch<Project[]>({
-    query: `*[_type == "project" && featured == true] | order(date desc) {
-      _id,
-      title,
-      slug,
-      shortDescription,
-      mainImage{ asset->{url}, alt },
-      technologies,
-      links,
-      categories[]->{ title, slug },
-      date
-    }`,
-    tags: ["project"],
-  });
+    // 3. Fetch All Projects (Featured logic handled in component)
+    sanityFetch<Project[]>({
+      query: `*[_type == "project"] | order(date desc) {
+        _id,
+        title,
+        slug,
+        shortDescription,
+        mainImage{ asset->{url}, alt },
+        technologies,
+        links,
+        categories[]->{ title, slug },
+        date,
+        featured
+      }`,
+      tags: ["project"],
+    }),
 
-  // 4. Fetch Skills
-  const skills = await sanityFetch<Skill[]>({
-    query: `*[_type == "skill"] | order(category asc, title asc) {
-      _id,
-      title,
-      category,
-      icon{ asset->{url}, alt }
-    }`,
-    tags: ["skill"],
-  });
+    // 4. Fetch Skills
+    sanityFetch<Skill[]>({
+      query: `*[_type == "skill"] | order(category asc, title asc) {
+        _id,
+        title,
+        category,
+        icon{ asset->{url}, alt }
+      }`,
+      tags: ["skill"],
+    }),
+  ]);
 
   return (
     <div className="bg-background text-foreground font-sans transition-colors duration-300 overflow-x-hidden">

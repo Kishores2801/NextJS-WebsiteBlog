@@ -26,7 +26,7 @@ export default function Projects() {
   useEffect(() => {
     const load = async () => {
       const data: Project[] = await client.fetch(`
-        *[_type == "project" && featured == true] | order(date desc) {
+        *[_type == "project"] | order(date desc) {
           title,
           slug,
           shortDescription,
@@ -63,7 +63,7 @@ export default function Projects() {
   return (
     <section className="max-w-4xl max-h-screen mx-auto px-4 py-14 h-screen">
       <h2 className="text-xl sm:text-2xl font-bold text-center text-[var(--color-primary)] mb-6">
-        Featured Projects
+        Project Gallery
       </h2>
 
       {/* Categories */}
