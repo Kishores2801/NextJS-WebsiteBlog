@@ -231,7 +231,7 @@ export default function Projects({ data = [] }: { data?: Project[] }) {
                         href={`/projects/${project.slug.current}`}
                         className="flex items-center gap-2 text-sm font-bold text-primary group/btn"
                       >
-                        Case Study 
+                        View Project
                         <FaArrowRight size={12} className="group-hover/btn:translate-x-1.5 transition-transform duration-300" />
                       </Link>
                       
