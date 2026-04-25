@@ -49,7 +49,7 @@ export default function Hero({ data }: { data?: HeroData }) {
           </span>
         </h1>
 
-        <div className="relative h-[3.5rem] overflow text-xl md:text-2xl text-secondary font-semibold">
+        <div className="relative h-24 sm:h-20 md:h-24 overflow-hidden text-xl md:text-2xl text-secondary font-semibold">
           {typewriterTexts?.length ? (
             <AnimatePresence mode="popLayout">
               <motion.div
@@ -58,7 +58,7 @@ export default function Hero({ data }: { data?: HeroData }) {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -40, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="w-[120%]"
+                className="w-full"
               >
                 {typewriterTexts[index]}
               </motion.div>

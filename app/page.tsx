@@ -15,7 +15,7 @@ import { Settings, HeroData, Project, Skill } from "@/types";
  */
 export default async function Home() {
   // Fetch data in parallel to avoid "waterfall" delays
-  const [settings, heroData, projects, skills] = await Promise.all([
+  const [settings, heroData, projects, skills, careerData, aboutData] = await Promise.all([
     // 1. Fetch Site Settings
     sanityFetch<Settings>({
       query: `*[_type == "siteSettings"][0]`,
@@ -60,6 +60,23 @@ export default async function Home() {
       }`,
       tags: ["skill"],
     }),
+
+    // 5. Fetch Career/Experience Data
+    sanityFetch<any[]>({
+      query: `*[_type == "career"] | order(startDate asc) {
+        _id, type, title, organization, startDate, endDate, isCurrent, logo, description, skills
+      }`,
+      tags: ["career"],
+    }),
+
+    // 6. Fetch "About" Section Details
+    sanityFetch<any>({
+      query: `{
+        "heroAbout": *[_type == "hero"][0]{ about },
+        "moreAbout": *[_type == "about"][0]{ items }
+      }`,
+      tags: ["hero", "about"],
+    }),
   ]);
 
   return (
@@ -76,7 +93,7 @@ export default async function Home() {
         {/* ========================= ABOUT ========================= */}
         {settings?.showAbout && (
           <section id="About" className="w-full scroll-mt-24">
-            <About />
+            <About initialData={aboutData} />
           </section>
         )}
 
@@ -84,7 +101,7 @@ export default async function Home() {
         {/* ========================= CAREER TIMELINE ========================= */}
         {settings?.showTimeline && (
           <section id="CareerTimeline" className="w-full scroll-mt-24">
-            <CareerTimeline />
+            <CareerTimeline initialData={careerData} />
           </section>
         )}
 

@@ -21,27 +21,17 @@ const container = {
   },
 };
 
-export default function AboutSection() {
-  const [data, setData] = useState<any>(null);
+export default function AboutSection({ initialData }: { initialData?: any }) {
+  const [data, setData] = useState<any>(initialData);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch both Hero (for bio) and About (for cards)
-        const result = await client.fetch(`{
-          "hero": *[_type == "hero"][0]{ about },
-          "moreAbout": *[_type == "about"][0]{ items }
-        }`);
-        setData(result);
-      } catch (error) {
-        console.error("Error fetching about section:", error);
-      }
-    };
+    if (initialData) {
+      setData(initialData);
+    }
+  }, [initialData]);
 
-    fetchData();
-  }, []);
+  if (!data?.heroAbout?.about) return null;
 
-  if (!data?.hero?.about) return null;
 
   return (
     <section
@@ -64,11 +54,11 @@ export default function AboutSection() {
 
           <div className="prose prose-lg dark:prose-invert text-[var(--foreground)]/90 leading-relaxed">
             <PortableText
-              value={data.hero.about}
+              value={data.heroAbout.about}
               components={{
                 block: {
-                  normal: ({ children }) => (
-                    <p className="mb-2 text-base md:text-10px">{children}</p>
+                    normal: ({ children }) => (
+                    <p className="mb-4 text-base leading-relaxed">{children}</p>
                   ),
                 },
               }}

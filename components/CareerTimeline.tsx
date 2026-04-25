@@ -24,22 +24,17 @@ export interface OrganizationGroup {
   roles: CareerItem[];
 }
 
-export default function CareerTimeline() {
-  const [careers, setCareers] = useState<CareerItem[]>([]);
+export default function CareerTimeline({ initialData = [] }: { initialData?: CareerItem[] }) {
+  const [careers, setCareers] = useState<CareerItem[]>(initialData);
   const [activeOrgIndex, setActiveOrgIndex] = useState(0);
   const [activeRoleIndex, setActiveRoleIndex] = useState(0);
 
   useEffect(() => {
-    const fetchCareer = async () => {
-      const data = await client.fetch(`
-        *[_type == "career"] | order(startDate asc) {
-          _id, type, title, organization, startDate, endDate, isCurrent, logo, description, skills
-        }
-      `);
-      setCareers(data);
-    };
-    fetchCareer();
-  }, []);
+    if (initialData.length > 0) {
+      setCareers(initialData);
+    }
+  }, [initialData]);
+
 
   // Group by Organization
   const groupedCareers = useMemo(() => {
@@ -124,9 +119,10 @@ export default function CareerTimeline() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center p-4">
+        {/* Desktop View: Grid with Details and Dial */}
+        <div className="hidden lg:grid lg:grid-cols-2 gap-20 items-center p-4">
           {/* LEFT: Details */}
-          <div className="order-2 lg:order-1 relative z-10 h-full flex items-center">
+          <div className="relative z-10 h-full flex items-center">
             <CareerDetails 
               item={activeRole} 
               roleIndex={activeRoleIndex} 
@@ -135,7 +131,7 @@ export default function CareerTimeline() {
           </div>
 
           {/* RIGHT: Dial */}
-          <div className="order-1 lg:order-2 h-fit lg:h-full relative">
+          <div className="h-fit lg:h-full relative">
              <CareerDial 
                groups={groupedCareers} 
                activeOrgIndex={activeOrgIndex} 
@@ -147,8 +143,52 @@ export default function CareerTimeline() {
           </div>
         </div>
 
-        {/* Manual Controls */}
-        <div className="absolute -bottom-6 sm:bottom-4 right-4 sm:right-4 flex items-center gap-2 z-50">
+        {/* Mobile/Tablet View: Clean Boxes */}
+        <div className="lg:hidden flex flex-col gap-6 px-4">
+          {careers.slice().reverse().map((career) => (
+            <div 
+              key={career._id} 
+              className="bg-[var(--card)] border border-[var(--border)] p-6 rounded-3xl shadow-sm hover:border-[var(--primary)]/50 transition-all"
+            >
+              <div className="flex flex-col gap-3">
+                <div className="flex justify-between items-start">
+                  <span className="text-xs font-bold text-[var(--primary)] uppercase tracking-widest">
+                    {career.organization}
+                  </span>
+                  <span className="text-[10px] text-[var(--muted-foreground)] uppercase">
+                    {new Date(career.startDate).getFullYear()} - {career.isCurrent ? "Present" : career.endDate ? new Date(career.endDate).getFullYear() : ""}
+                  </span>
+                </div>
+                
+                <h3 className="text-xl font-bold text-[var(--foreground)]">
+                  {career.title}
+                </h3>
+                
+                {career.description && (
+                  <p className="text-sm text-[var(--muted-foreground)] leading-relaxed line-clamp-3">
+                    {career.description}
+                  </p>
+                )}
+
+                {career.skills && career.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {career.skills.slice(0, 4).map((skill) => (
+                      <span 
+                        key={skill} 
+                        className="px-2 py-0.5 text-[10px] rounded-md bg-[var(--background)] border border-[var(--border)] text-[var(--foreground)]"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop ONLY Manual Controls */}
+        <div className="hidden lg:flex absolute -bottom-6 sm:bottom-4 right-4 sm:right-4 items-center gap-2 z-50">
           <button 
             onClick={handleRestart}
             className="px-3 py-1 bg-[var(--card)] border border-[var(--border)] rounded-full text-xs hover:bg-[var(--primary)] hover:text-white transition-colors"
