@@ -54,22 +54,31 @@ export const projectType = defineType({
     defineField({
       name: 'challenge',
       title: 'The Challenge (Situation/Task)',
-      type: 'text',
-      rows: 4,
+      type: 'array',
+      of: [
+        { type: 'block' }, // portable text
+        { type: 'image', options: { hotspot: true } },
+      ],
       description: 'Describe the problem or context of the project.',
     }),
     defineField({
       name: 'action',
       title: 'The Action (Approach)',
-      type: 'text',
-      rows: 4,
+      type: 'array',
+      of: [
+        { type: 'block' }, // portable text
+        { type: 'image', options: { hotspot: true } },
+      ],
       description: 'What specific steps did you take to solve the challenge?',
     }),
     defineField({
       name: 'impact',
       title: 'The Impact (Result/Metrics)',
-      type: 'text',
-      rows: 4,
+      type: 'array',
+      of: [
+        { type: 'block' }, // portable text
+        { type: 'image', options: { hotspot: true } },
+      ],
       description: 'What were the measurable outcomes? E.g., increased conversion by 20%.',
     }),
 
