@@ -201,7 +201,7 @@ const CustomPortableText = ({ value }: { value: any }) => {
       h1: ({ children, value }: { children?: React.ReactNode; value?: any }) => (
         <h1
           id={value?._key}
-          className="scroll-mt-28 text-4xl md:text-5xl font-extrabold mt-12 mb-6 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent tracking-tight"
+          className="scroll-mt-28 text-4xl md:text-5xl font-extrabold mt-12 mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text !text-transparent tracking-tight"
         >
           {children}
         </h1>
@@ -209,7 +209,7 @@ const CustomPortableText = ({ value }: { value: any }) => {
       h2: ({ children, value }: { children?: React.ReactNode; value?: any }) => (
         <h2
           id={value?._key}
-          className="scroll-mt-28 text-3xl md:text-4xl font-bold mt-10 mb-5 text-[var(--foreground)] tracking-tight border-b border-[var(--border)] pb-2"
+          className="scroll-mt-28 text-3xl md:text-4xl font-bold mt-10 mb-5 !text-foreground tracking-tight border-b border-border pb-2"
         >
           {children}
         </h2>
@@ -217,7 +217,7 @@ const CustomPortableText = ({ value }: { value: any }) => {
       h3: ({ children, value }: { children?: React.ReactNode; value?: any }) => (
         <h3
           id={value?._key}
-          className="scroll-mt-28 text-2xl md:text-3xl font-semibold mt-8 mb-4 text-[var(--foreground)]"
+          className="scroll-mt-28 text-2xl md:text-3xl font-semibold mt-8 mb-4 !text-foreground"
         >
           {children}
         </h3>
@@ -225,18 +225,34 @@ const CustomPortableText = ({ value }: { value: any }) => {
       h4: ({ children, value }: { children?: React.ReactNode; value?: any }) => (
         <h4
           id={value?._key}
-          className="scroll-mt-28 text-xl md:text-2xl font-medium mt-6 mb-3 text-[var(--foreground)]"
+          className="scroll-mt-28 text-xl md:text-2xl font-medium mt-6 mb-3 !text-foreground"
         >
           {children}
         </h4>
       ),
       normal: ({ children }: { children?: React.ReactNode }) => (
-        <p className="text-base md:text-lg leading-relaxed mb-6 text-[var(--foreground)]/90">{children}</p>
+        <p className="text-base md:text-lg leading-relaxed mb-6 text-foreground/90">{children}</p>
       ),
       blockquote: ({ children }: { children?: React.ReactNode }) => (
-        <blockquote className="border-l-4 border-[var(--color-primary)] bg-[var(--muted)]/30 py-4 px-6 rounded-r-lg italic text-[var(--muted-foreground)] my-8">
+        <blockquote className="border-l-4 border-primary bg-muted/30 py-4 px-6 rounded-r-lg italic text-muted-foreground my-8">
           {children}
         </blockquote>
+      ),
+    },
+    list: {
+      bullet: ({ children }: { children?: React.ReactNode }) => (
+        <ul className="list-disc ml-8 mb-6 space-y-2 text-base md:text-lg leading-relaxed text-foreground/90">{children}</ul>
+      ),
+      number: ({ children }: { children?: React.ReactNode }) => (
+        <ol className="list-decimal ml-8 mb-6 space-y-2 text-base md:text-lg leading-relaxed text-foreground/90">{children}</ol>
+      ),
+    },
+    listItem: {
+      bullet: ({ children }: { children?: React.ReactNode }) => (
+        <li className="pl-1">{children}</li>
+      ),
+      number: ({ children }: { children?: React.ReactNode }) => (
+        <li className="pl-1">{children}</li>
       ),
     },
 

@@ -47,40 +47,9 @@ export const projectType = defineType({
         { type: 'block' }, // portable text
         { type: 'image', options: { hotspot: true } },
       ],
-      description: 'Full case study: Problem, Solution, Tech Stack, and Outcome.',
+      description: 'Full case study: Follow Star Method, Challenge, Action, and Impact.',
     }),
 
-    // 🌟 STAR Method Fields
-    defineField({
-      name: 'challenge',
-      title: 'The Challenge (Situation/Task)',
-      type: 'array',
-      of: [
-        { type: 'block' }, // portable text
-        { type: 'image', options: { hotspot: true } },
-      ],
-      description: 'Describe the problem or context of the project.',
-    }),
-    defineField({
-      name: 'action',
-      title: 'The Action (Approach)',
-      type: 'array',
-      of: [
-        { type: 'block' }, // portable text
-        { type: 'image', options: { hotspot: true } },
-      ],
-      description: 'What specific steps did you take to solve the challenge?',
-    }),
-    defineField({
-      name: 'impact',
-      title: 'The Impact (Result/Metrics)',
-      type: 'array',
-      of: [
-        { type: 'block' }, // portable text
-        { type: 'image', options: { hotspot: true } },
-      ],
-      description: 'What were the measurable outcomes? E.g., increased conversion by 20%.',
-    }),
 
     // 🖼️ Main Image
     defineField({

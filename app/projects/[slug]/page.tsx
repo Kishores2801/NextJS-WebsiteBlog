@@ -50,10 +50,7 @@ export default async function ProjectPage({ params }: Props) {
         links,
         categories[]->{ title, slug },
         date,
-        features,
-        challenge,
-        action,
-        impact
+        features
       }
     `,
     params: { slug },
@@ -119,78 +116,42 @@ export default async function ProjectPage({ params }: Props) {
       )}
 
       {/* Content Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-12">
+      <div className="flex flex-col gap-12 w-full">
         
-        {/* Main Content */}
-        <div className="prose prose-lg dark:prose-invert max-w-none">
-          {/* STAR Method Section */}
-          {(project.challenge || project.action || project.impact) && (
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-12 not-prose">
-              {project.challenge && (
-                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-                  <h3 className="text-xl font-bold mb-3 flex items-center text-[var(--accent)]">
-                    <span className="text-2xl mr-2">🎯</span> The Challenge
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{project.challenge}</p>
-                </div>
-              )}
-              {project.action && (
-                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-                  <h3 className="text-xl font-bold mb-3 flex items-center text-[var(--accent)]">
-                    <span className="text-2xl mr-2">⚡</span> The Action
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{project.action}</p>
-                </div>
-              )}
-              {project.impact && (
-                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-                  <h3 className="text-xl font-bold mb-3 flex items-center text-[var(--accent)]">
-                    <span className="text-2xl mr-2">🚀</span> The Impact
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{project.impact}</p>
-                </div>
-              )}
-            </div>
-          )}
+        {/* Links (Top) */}
+        {(project.links?.live || project.links?.github || project.links?.demo) && (
+          <div className="flex flex-wrap gap-4">
+            {project.links.live && (
+              <a href={project.links.live} target="_blank" rel="noopener noreferrer" className="btn-primary flex-1 sm:flex-none px-6 py-3 rounded-lg bg-primary text-white hover:bg-primary/90 transition text-center font-medium shadow-sm">
+                Visit Live Site
+              </a>
+            )}
+            {project.links.github && (
+              <a href={project.links.github} target="_blank" rel="noopener noreferrer" className="btn-secondary flex-1 sm:flex-none px-6 py-3 rounded-lg border border-border hover:bg-muted transition text-center font-medium text-foreground shadow-sm">
+                View Source Code
+              </a>
+            )}
+          </div>
+        )}
 
+        {/* Main Content */}
+        <div className="prose prose-lg dark:prose-invert max-w-none w-full">
           {project.description && <CustomPortableText value={project.description} />}
         </div>
 
-        {/* Sidebar */}
-        <aside className="space-y-8">
-          {/* Links */}
-          {(project.links?.live || project.links?.github || project.links?.demo) && (
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-              <h3 className="text-lg font-bold mb-4 text-foreground">Project Links</h3>
-              <div className="flex flex-col gap-3">
-                {project.links.live && (
-                  <a href={project.links.live} target="_blank" rel="noopener noreferrer" className="btn-primary w-full text-center py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition">
-                    Visit Live Site
-                  </a>
-                )}
-                {project.links.github && (
-                  <a href={project.links.github} target="_blank" rel="noopener noreferrer" className="btn-secondary w-full text-center py-2 rounded-lg border border-border hover:bg-muted transition">
-                    View Source Code
-                  </a>
-                )}
-              </div>
+        {/* Tech Stack (Bottom) */}
+        {project.technologies && project.technologies.length > 0 && (
+          <div className="bg-card border border-border rounded-xl p-8 shadow-sm w-full mt-4">
+            <h3 className="text-xl font-bold mb-6 text-foreground">Technologies Used</h3>
+            <div className="flex flex-wrap gap-3">
+              {project.technologies.map((tech) => (
+                <span key={tech} className="px-4 py-2 bg-muted text-foreground text-sm rounded-md border border-border/50 font-medium">
+                  {tech}
+                </span>
+              ))}
             </div>
-          )}
-
-          {/* Tech Stack */}
-          {project.technologies && project.technologies.length > 0 && (
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-              <h3 className="text-lg font-bold mb-4 text-foreground">Technologies</h3>
-              <div className="flex flex-wrap gap-2">
-                {project.technologies.map((tech) => (
-                  <span key={tech} className="px-3 py-1 bg-muted text-foreground text-sm rounded-md border border-border/50">
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </aside>
+          </div>
+        )}
       </div>
 
       {/* Back Button */}

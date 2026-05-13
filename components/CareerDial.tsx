@@ -65,8 +65,8 @@ export default function CareerDial({ groups, activeOrgIndex, onOrgChange }: Care
           const rad = (angle * Math.PI) / 180;
           
           // Position items on the circle
-          const x = DIAL_RADIUS * Math.cos(rad);
-          const y = DIAL_RADIUS * Math.sin(rad);
+          const x = Math.round(DIAL_RADIUS * Math.cos(rad));
+          const y = Math.round(DIAL_RADIUS * Math.sin(rad));
 
           const isActive = index === activeOrgIndex;
 

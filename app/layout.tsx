@@ -64,7 +64,7 @@ export default async function RootLayout({
   const accentColor = settings?.primaryAccentColor || "#3b82f6";
 
   return (
-    <html lang="en" suppressHydrationWarning style={{ '--accent': accentColor } as React.CSSProperties}>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" style={{ '--accent': accentColor } as React.CSSProperties}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground transition-colors duration-300`}
         suppressHydrationWarning
