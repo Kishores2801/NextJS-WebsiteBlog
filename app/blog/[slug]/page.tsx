@@ -102,12 +102,12 @@ export default async function BlogPost({ params }: Props) {
         </header>
 
         {post.mainImage?.asset?.url && (
-          <div className="relative w-full aspect-[2/1] rounded-2xl overflow-hidden mb-12 shadow-lg">
+          <div className="relative w-full aspect-[2/1] rounded-2xl overflow-hidden mb-12 shadow-lg bg-muted/10">
             <Image
               src={urlFor(post.mainImage).width(1600).height(800).quality(100).url()}
               alt={post.mainImage.alt || post.title}
               fill
-              className="object-cover"
+              className="object-contain"
               priority
               quality={100}
               unoptimized

@@ -8,6 +8,71 @@ import { useTheme } from 'next-themes'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
 
+const preprocessMath = (blocks: any[]): any[] => {
+  if (!Array.isArray(blocks)) return blocks
+
+  return blocks.map((block) => {
+    if (block._type === 'block' && Array.isArray(block.children)) {
+      const newChildren: any[] = []
+      let hasBlockMath = false
+
+      block.children.forEach((child) => {
+        if (child._type === 'span' && typeof child.text === 'string') {
+          const text = child.text
+          const regex = /\$\$([\s\S]*?)\$\$|\$([^\$]+?)\$/g
+          let lastIndex = 0
+          let match
+
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              newChildren.push({
+                ...child,
+                _key: `${child._key || ''}-t-${lastIndex}`,
+                text: text.slice(lastIndex, match.index)
+              })
+            }
+
+            if (match[1] !== undefined) {
+              hasBlockMath = true
+              newChildren.push({
+                _type: 'latex',
+                _key: `${child._key || ''}-m-${match.index}`,
+                formula: match[1]
+              })
+            } else if (match[2] !== undefined) {
+              newChildren.push({
+                _type: 'latexInline',
+                _key: `${child._key || ''}-m-${match.index}`,
+                formula: match[2]
+              })
+            }
+            lastIndex = regex.lastIndex
+          }
+
+          if (lastIndex < text.length) {
+            newChildren.push({
+              ...child,
+              _key: `${child._key || ''}-t-${lastIndex}`,
+              text: text.slice(lastIndex)
+            })
+          }
+        } else {
+          newChildren.push(child)
+        }
+      })
+
+      const newStyle = (hasBlockMath && (!block.style || block.style === 'normal')) ? 'normal-math' : block.style
+      
+      return {
+        ...block,
+        style: newStyle,
+        children: newChildren
+      }
+    }
+    return block
+  })
+}
+
 const CustomPortableText = ({ value }: { value: any }) => {
   const { theme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -22,17 +87,23 @@ const CustomPortableText = ({ value }: { value: any }) => {
         if (!value?.asset?._ref) {
           return null
         }
+        
+        const ref = value.asset._ref;
+        const dimensionsMatch = ref.match(/-(\d+)x(\d+)-/);
+        const width = dimensionsMatch ? parseInt(dimensionsMatch[1], 10) : 1200;
+        const height = dimensionsMatch ? parseInt(dimensionsMatch[2], 10) : 700;
+
         return (
           <figure className="my-10 text-center w-full group">
-            <div className="overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 hover:scale-[1.01]">
+            <div className="overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 hover:scale-[1.01] bg-muted/5">
               <Image
                 src={urlFor(value).width(2400).quality(100).fit('max').auto('format').url()}
                 alt={value.alt || 'Image'}
-                width={1200}
-                height={700}
+                width={width}
+                height={height}
                 quality={100}
                 unoptimized
-                className="object-cover w-full h-auto max-h-[80vh]"
+                className="object-contain w-full h-auto max-h-[80vh]"
               />
             </div>
             {value.caption && (
@@ -233,6 +304,9 @@ const CustomPortableText = ({ value }: { value: any }) => {
       normal: ({ children }: { children?: React.ReactNode }) => (
         <p className="text-base md:text-lg leading-relaxed mb-6 text-foreground/90">{children}</p>
       ),
+      'normal-math': ({ children }: { children?: React.ReactNode }) => (
+        <div className="text-base md:text-lg leading-relaxed mb-6 text-foreground/90">{children}</div>
+      ),
       blockquote: ({ children }: { children?: React.ReactNode }) => (
         <blockquote className="border-l-4 border-primary bg-muted/30 py-4 px-6 rounded-r-lg italic text-muted-foreground my-8">
           {children}
@@ -292,9 +366,11 @@ const CustomPortableText = ({ value }: { value: any }) => {
     },
   }
 
+  const processedValue = preprocessMath(value)
+
   return (
     <div className="prose prose-invert max-w-none text-[var(--foreground)] transition-colors duration-300">
-      <PortableText value={value} components={components} />
+      <PortableText value={processedValue} components={components} />
     </div>
   )
 }

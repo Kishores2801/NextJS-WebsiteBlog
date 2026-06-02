@@ -103,12 +103,12 @@ export default async function ProjectPage({ params }: Props) {
 
       {/* Main Image */}
       {project.mainImage?.asset?.url && (
-        <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-16 bg-muted">
+        <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl mb-16 bg-muted/10">
           <Image
             src={urlFor(project.mainImage).width(1920).height(1080).quality(100).url()}
             alt={project.mainImage.alt || project.title}
             fill
-            className="object-cover"
+            className="object-contain"
             priority
             unoptimized
           />
