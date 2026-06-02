@@ -16,7 +16,7 @@ const preprocessMath = (blocks: any[]): any[] => {
       const newChildren: any[] = []
       let hasBlockMath = false
 
-      block.children.forEach((child) => {
+      block.children.forEach((child: any) => {
         if (child._type === 'span' && typeof child.text === 'string') {
           const text = child.text
           const regex = /\$\$([\s\S]*?)\$\$|\$([^\$]+?)\$/g
