@@ -2,7 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@/components/theme-provider";
 import FloatingNav from "@/components/FloatingNav";
 import Footer from "@/components/footer";
 import JsonLd from "@/components/JsonLd"; 
@@ -21,26 +21,26 @@ const geistMono = Geist_Mono({
 
 // 🌍 SEO Metadata
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kishore-portfolio.com"), // Replace with actual domain
+  metadataBase: new URL("https://kishore-portfolio.com"),
   title: {
-    default: "Kishore Portfolio & Blog",
-    template: "%s | Kishore Portfolio",
+    default: "Kishore Shanmugam | Lead Data Analyst & AI Engineer",
+    template: "%s | Kishore Shanmugam",
   },
-  description: "Marvel/DC themed portfolio showcasing skills, projects, and blog.",
-  keywords: ["Portfolio", "Software Engineer", "Web Developer", "React", "Next.js", "Sanity"],
-  authors: [{ name: "Kishore" }],
+  description: "Portfolio of Kishore Shanmugam — Lead Data Analyst exploring the intersection of Business Analytics, Machine Learning, and AI Engineering.",
+  keywords: ["Lead Data Analyst", "Business Analytics", "Machine Learning", "AI Engineering", "Python", "Data Science", "Next.js", "Sanity"],
+  authors: [{ name: "Kishore Shanmugam" }],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://kishore-portfolio.com",
-    title: "Kishore Portfolio & Blog",
-    description: "Marvel/DC themed portfolio showcasing skills, projects, and blog.",
-    siteName: "Kishore Portfolio",
+    title: "Kishore Shanmugam | Lead Data Analyst & AI Engineer",
+    description: "Turning complex data into intelligent, actionable solutions.",
+    siteName: "Kishore Shanmugam",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kishore Portfolio & Blog",
-    description: "Marvel/DC themed portfolio showcasing skills, projects, and blog.",
+    title: "Kishore Shanmugam | Lead Data Analyst & AI Engineer",
+    description: "Turning complex data into intelligent, actionable solutions.",
   },
   robots: {
     index: true,
@@ -61,19 +61,31 @@ export default async function RootLayout({
     tags: ["siteSettings"],
   }).catch(() => null);
 
-  const accentColor = settings?.primaryAccentColor || "#3b82f6";
+  const primaryColor = settings?.primaryAccentColor;
 
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" style={{ '--accent': accentColor } as React.CSSProperties}>
+    <html 
+      lang="en" 
+      suppressHydrationWarning 
+      data-scroll-behavior="smooth" 
+      style={primaryColor ? ({ '--primary': primaryColor } as React.CSSProperties) : undefined}
+    >
+      <head>
+        <JsonLd />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground transition-colors duration-300`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground transition-colors duration-300 flex flex-col min-h-screen overflow-x-hidden`}
         suppressHydrationWarning
       >
-        <JsonLd />
         {/* Wrap everything inside ThemeProvider to prevent hydration mismatch */}
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="system" 
+          enableSystem 
+          disableTransitionOnChange
+        >
           <FloatingNav settings={settings || undefined} />
-          <main className="min-h-screen flex flex-col pb-32">{children}</main>
+          <main className="flex-1 flex flex-col w-full pb-16 md:pb-32 relative">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity'
-import { FolderIcon } from '@sanity/icons'
+import { FolderIcon, BarChartIcon } from '@sanity/icons'
 
 /**
  * 📂 Project Schema
@@ -38,7 +38,7 @@ export const projectType = defineType({
       validation: (Rule) => Rule.max(200).warning('Keep it short for better UI.'),
     }),
 
-    // 🧾 Detailed Description (Rich Text)
+    // 🧾 Detailed Description (Rich Text with Chart Support)
     defineField({
       name: 'description',
       title: 'Full Description',
@@ -46,10 +46,10 @@ export const projectType = defineType({
       of: [
         { type: 'block' }, // portable text
         { type: 'image', options: { hotspot: true } },
+        { type: 'chart', icon: BarChartIcon }, // interactive charts
       ],
       description: 'Full case study: Follow Star Method, Challenge, Action, and Impact.',
     }),
-
 
     // 🖼️ Main Image
     defineField({

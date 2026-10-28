@@ -1,45 +1,58 @@
 "use client";
+
+import React from "react";
 import { usePathname, useRouter } from "next/navigation";
+
+interface NavLinkProps {
+  href: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  "aria-current"?: "page" | "step" | "location" | "date" | "time" | boolean;
+}
 
 export default function NavLink({
   href,
   children,
   onClick,
-  className,
-}: {
-  href: string;
-  children: React.ReactNode;
-  onClick?: () => void;
-  className?: string;
-}) {
+  className = "",
+  "aria-current": ariaCurrent,
+}: NavLinkProps) {
   const router = useRouter();
   const pathname = usePathname();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
+    // Let cmd/ctrl click open in new tab
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
 
+    e.preventDefault();
     if (onClick) onClick();
 
-    // Handle section links (anchors)
-    if (href.startsWith("#")) {
+    const isHash = href.startsWith("#") || href.startsWith("/#");
+    const hashId = href.startsWith("/#") ? href.slice(1) : href;
+
+    if (isHash) {
       if (pathname === "/") {
-        // already on home → smooth scroll
-        const el = document.querySelector(href);
+        const el = document.querySelector(hashId);
         if (el) {
           el.scrollIntoView({ behavior: "smooth" });
+          window.history.pushState(null, "", hashId);
+          return;
         }
-      } else {
-        // navigate to home with hash, Next will scroll automatically
-        router.push("/" + href);
       }
+      router.push("/" + hashId);
     } else {
-      // for normal pages like /blog
       router.push(href);
     }
   };
 
   return (
-    <a href={href} onClick={handleClick} className={className}>
+    <a
+      href={href}
+      onClick={handleClick}
+      className={className}
+      aria-current={ariaCurrent}
+    >
       {children}
     </a>
   );

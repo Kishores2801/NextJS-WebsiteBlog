@@ -1,8 +1,8 @@
-import React from 'react'
+import React from 'react';
 
 /**
  * 🔍 JsonLd
- * Adds structured data (Person, WebSite) to the page head for better SEO.
+ * Adds structured data (Person, WebSite) to the page head for rich search indexing and SEO.
  */
 export default function JsonLd() {
   const jsonLd = {
@@ -10,26 +10,43 @@ export default function JsonLd() {
     '@graph': [
       {
         '@type': 'Person',
-        'name': 'Kishore', // TODO: Make dynamic if needed
-        'url': 'https://kishore-portfolio.com', // Replace with actual domain
-        'jobTitle': 'Software Engineer',
+        'name': 'Kishore Shanmugam',
+        'url': 'https://kishore-portfolio.com',
+        'jobTitle': 'Lead Data Analyst',
+        'worksFor': {
+          '@type': 'Organization',
+          'name': 'Grant Thornton Stax',
+        },
         'sameAs': [
-          'https://github.com/your-github',
-          'https://linkedin.com/in/your-linkedin'
-        ]
+          'https://github.com/Kishores2801',
+          'https://www.linkedin.com/in/kishore-shan',
+          'https://www.fiverr.com/users/kishore_data',
+          'https://www.upwork.com/freelancers/~01ed5351b55a5e345c',
+        ],
+        'knowsAbout': [
+          'Business Analytics',
+          'Machine Learning',
+          'Data Visualization',
+          'Python',
+          'Power BI',
+          'AI Engineering',
+        ],
       },
       {
         '@type': 'WebSite',
-        'name': 'Kishore Portfolio & Blog',
-        'url': 'https://kishore-portfolio.com'
-      }
-    ]
-  }
+        'name': 'Kishore Shanmugam | Portfolio & Blog',
+        'url': 'https://kishore-portfolio.com',
+        'description': 'Turning complex data into intelligent, actionable solutions.',
+      },
+    ],
+  };
 
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+      }}
     />
-  )
+  );
 }

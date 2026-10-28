@@ -1,19 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Mail, MapPin, FileText } from "lucide-react";
+import { Mail, MapPin, FileText, Send, Check } from "lucide-react";
 import { client } from "@/sanity/lib/client";
+import SectionHeader from "@/components/ui/SectionHeader";
 
-// -----------------------------
-// Types
-// -----------------------------
 interface HeroContactData {
   email?: string;
   location?: string;
   resumeUrl?: string;
 }
 
-const Contact = () => {
+export default function Contact() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -22,11 +20,8 @@ const Contact = () => {
   });
 
   const [heroData, setHeroData] = useState<HeroContactData>({});
-  const [loading, setLoading] = useState(true);
+  const [submitted, setSubmitted] = useState(false);
 
-  // -----------------------------
-  // Fetch Hero Contact Info
-  // -----------------------------
   useEffect(() => {
     const fetchHeroData = async () => {
       try {
@@ -37,21 +32,15 @@ const Contact = () => {
             "resumeUrl": resume.asset->url
           }
         `);
-
-        setHeroData(data);
+        setHeroData(data || {});
       } catch (error) {
         console.error("Failed to fetch hero contact data:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchHeroData();
   }, []);
 
-  // -----------------------------
-  // Form Handlers
-  // -----------------------------
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -61,184 +50,194 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const recipient = heroData?.email || "info@example.com";
+    const recipient = heroData?.email || "kishoreshan2801@gmail.com";
     const subject = encodeURIComponent(
-      formData.subject || `Message from ${formData.name}`
+      formData.subject || `Inquiry from ${formData.name}`
     );
     const body = encodeURIComponent(
       `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
     );
 
-    window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+    setSubmitted(true);
+    setTimeout(() => {
+      window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+      setSubmitted(false);
+    }, 300);
   };
 
-  if (loading) {
-    return (
-      <p className="text-center text-[var(--muted-foreground)]">Loading…</p>
-    );
-  }
-
   return (
-    <section
-      id="Contact"
-      className="relative flex w-full flex-col justify-center py-12 px-5 sm:px-8 lg:px-12 
-                 bg-[var(--background)] text-[var(--foreground)] transition-colors duration-300"
-    >
-      <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12">
-        {/* ------------------------- */}
-        {/* LEFT COLUMN – FORM */}
-        {/* ------------------------- */}
-        <div className="flex flex-col gap-5 justify-center">
-          <h1 className="text-2xl md:text-3xl font-extrabold">
-            Let&apos;s Connect
-          </h1>
+    <section id="Contact" className="w-full py-10 sm:py-14 scroll-mt-24">
+      <SectionHeader
+        eyebrow="Connect"
+        title="Get in Touch"
+        subtitle="Available for data analytics consulting, machine learning initiatives, and technical roles."
+      />
 
-          <p className="text-[var(--muted-foreground)] text-sm leading-relaxed max-w-sm">
-            Feel free to reach out for collaborations, job opportunities, or
-            just to say hello! I&apos;m always open to meaningful conversations.
-          </p>
+      <div className="max-w-4xl mx-auto rounded-xl border border-border/70 bg-card text-card-foreground p-6 sm:p-8 md:p-10">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-10 items-start">
+          {/* Form (3 Cols) */}
+          <div className="md:col-span-3">
+            <h3 className="text-lg font-bold tracking-tight text-foreground mb-1">
+              Send a Message
+            </h3>
+            <p className="text-xs text-muted-foreground mb-5 leading-relaxed">
+              Fill in your details below to draft an email directly to my inbox.
+            </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <InputField
-              label="Name"
-              type="text"
-              name="name"
-              placeholder="Your Name"
-              value={formData.name}
-              onChange={handleChange}
-            />
-
-            <InputField
-              label="Email"
-              type="email"
-              name="email"
-              placeholder="your.email@example.com"
-              value={formData.email}
-              onChange={handleChange}
-            />
-
-            <InputField
-              label="Subject"
-              type="text"
-              name="subject"
-              placeholder="What is this about?"
-              value={formData.subject}
-              onChange={handleChange}
-            />
-
-            <TextAreaField
-              label="Message"
-              name="message"
-              placeholder="Write your message here..."
-              value={formData.message}
-              onChange={handleChange}
-            />
-
-            <button
-              type="submit"
-              className="mt-2 w-full sm:w-auto rounded-md 
-                         bg-[var(--color-primary)] px-6 py-2.5 font-semibold text-[var(--primary-foreground)]
-                         shadow-[0_0_8px_var(--color-primary)] hover:bg-[var(--color-accent)] 
-                         hover:shadow-[0_0_14px_var(--color-primary)]
-                         transition-all duration-300"
-            >
-              Send Message
-            </button>
-          </form>
-        </div>
-
-        {/* ------------------------- */}
-        {/* RIGHT COLUMN – CONTACT INFO */}
-        {/* ------------------------- */}
-        <div className="flex flex-col gap-6 h-full md:pl-8 md:border-l border-[var(--border)] pt-10">
-          <ContactInfo
-            icon={<Mail size={20} />}
-            title="Email"
-            text={heroData.email || "Not provided"}
-          />
-
-          <ContactInfo
-            icon={<MapPin size={20} />}
-            title="Location"
-            text={heroData.location || "Not provided"}
-          />
-
-          {heroData.resumeUrl && (
-            <ContactInfo
-              icon={<FileText size={20} />}
-              title="Resume"
-              text={
-                <a
-                  href={heroData.resumeUrl}
-                  target="_blank"
-                  className="text-[var(--color-primary)] hover:text-[var(--color-accent)] hover:underline"
+            <form onSubmit={handleSubmit} className="space-y-3.5">
+              <div>
+                <label
+                  htmlFor="contact-name"
+                  className="block text-xs font-semibold text-foreground mb-1"
                 >
-                  Download Resume
+                  Your Name <span className="text-primary">*</span>
+                </label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  name="name"
+                  required
+                  placeholder="Your Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full h-10 px-3 rounded-lg border border-border/70 bg-background text-foreground text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground focus:border-foreground transition-all"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="contact-email"
+                  className="block text-xs font-semibold text-foreground mb-1"
+                >
+                  Email Address <span className="text-primary">*</span>
+                </label>
+                <input
+                  id="contact-email"
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="name@company.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full h-10 px-3 rounded-lg border border-border/70 bg-background text-foreground text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground focus:border-foreground transition-all"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="contact-subject"
+                  className="block text-xs font-semibold text-foreground mb-1"
+                >
+                  Subject
+                </label>
+                <input
+                  id="contact-subject"
+                  type="text"
+                  name="subject"
+                  placeholder="Project Collaboration / Discussion"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="w-full h-10 px-3 rounded-lg border border-border/70 bg-background text-foreground text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground focus:border-foreground transition-all"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="contact-message"
+                  className="block text-xs font-semibold text-foreground mb-1"
+                >
+                  Message <span className="text-primary">*</span>
+                </label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  rows={4}
+                  required
+                  placeholder="Project scope, objectives, or questions..."
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-lg border border-border/70 bg-background text-foreground text-xs sm:text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground focus:border-foreground transition-all resize-none"
+                />
+              </div>
+
+              <div className="pt-1">
+                <button
+                  type="submit"
+                  disabled={submitted}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-xs font-semibold bg-foreground text-background hover:opacity-90 active:scale-[0.98] transition-all shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  {submitted ? (
+                    <>
+                      <Check size={14} />
+                      <span>Opening Client...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send size={13} />
+                      <span>Send Message</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Direct Details Sidebar (2 Cols) */}
+          <div className="md:col-span-2 flex flex-col gap-5 md:pl-6 md:border-l border-border/50">
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                Direct Contact
+              </h4>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-primary shrink-0 border border-border/40">
+                <Mail size={15} />
+              </div>
+              <div>
+                <h5 className="text-[11px] font-semibold text-muted-foreground uppercase">Email</h5>
+                <a
+                  href={`mailto:${heroData.email || "kishoreshan2801@gmail.com"}`}
+                  className="text-xs sm:text-sm font-medium text-foreground hover:text-primary transition-colors break-all"
+                >
+                  {heroData.email || "kishoreshan2801@gmail.com"}
                 </a>
-              }
-            />
-          )}
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-primary shrink-0 border border-border/40">
+                <MapPin size={15} />
+              </div>
+              <div>
+                <h5 className="text-[11px] font-semibold text-muted-foreground uppercase">Location</h5>
+                <p className="text-xs sm:text-sm font-medium text-foreground">
+                  {heroData.location || "Colombo, Sri Lanka"}
+                </p>
+              </div>
+            </div>
+
+            {heroData.resumeUrl && (
+              <div className="flex items-start gap-3 pt-1">
+                <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-primary shrink-0 border border-border/40">
+                  <FileText size={15} />
+                </div>
+                <div>
+                  <h5 className="text-[11px] font-semibold text-muted-foreground uppercase">Resume</h5>
+                  <a
+                    href={heroData.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs sm:text-sm font-semibold text-primary hover:underline inline-flex items-center gap-1 mt-0.5"
+                  >
+                    Download CV (PDF)
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
   );
-};
-
-// -----------------------------
-// Subcomponents
-// -----------------------------
-const InputField = ({ label, ...props }: any) => (
-  <label className="flex flex-col w-full">
-    <p className="text-xs font-medium pb-1 text-[var(--muted-foreground)]">
-      {label}
-    </p>
-    <input
-      {...props}
-      required
-      className="h-10 rounded-md border border-[var(--border)] 
-                 bg-[var(--input)] px-3 text-sm text-[var(--foreground)] 
-                 placeholder:text-[var(--muted-foreground)]
-                 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/60"
-    />
-  </label>
-);
-
-const TextAreaField = ({ label, ...props }: any) => (
-  <label className="flex flex-col w-full">
-    <p className="text-xs font-medium pb-1 text-[var(--muted-foreground)]">
-      {label}
-    </p>
-    <textarea
-      rows={3}
-      {...props}
-      required
-      className="rounded-md border border-[var(--border)] 
-                 bg-[var(--input)] px-3 py-2 text-sm text-[var(--foreground)]
-                 placeholder:text-[var(--muted-foreground)]
-                 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/60 resize-none"
-    />
-  </label>
-);
-
-const ContactInfo = ({
-  icon,
-  title,
-  text,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  text: React.ReactNode;
-}) => (
-  <div className="flex items-start gap-3">
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md 
-                    bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
-      {icon}
-    </div>
-    <div>
-      <h3 className="text-base font-semibold">{title}</h3>
-      <p className="text-sm text-[var(--muted-foreground)]">{text}</p>
-    </div>
-  </div>
-);
-
-export default Contact;
+}

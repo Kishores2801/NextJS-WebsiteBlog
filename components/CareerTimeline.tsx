@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { client } from "@/sanity/lib/client";
-import CareerDial from "./CareerDial";
-import CareerDetails from "./CareerDetails";
+import React, { useState } from "react";
+import Image from "next/image";
+import { Briefcase, GraduationCap, ChevronDown, ChevronUp, Calendar } from "lucide-react";
+import { urlFor } from "@/sanity/lib/image";
+import SectionHeader from "@/components/ui/SectionHeader";
 
-interface CareerItem {
+export interface CareerItem {
   _id: string;
-  type: "work" | "education";
+  type?: "work" | "education";
   title: string;
   organization: string;
   startDate: string;
@@ -22,195 +23,193 @@ export interface OrganizationGroup {
   organization: string;
   logo?: any;
   roles: CareerItem[];
+  earliestDate?: string;
+  latestDate?: string;
+  isCurrent?: boolean;
 }
 
-export default function CareerTimeline({ initialData = [] }: { initialData?: CareerItem[] }) {
-  const [careers, setCareers] = useState<CareerItem[]>(initialData);
-  const [activeOrgIndex, setActiveOrgIndex] = useState(0);
-  const [activeRoleIndex, setActiveRoleIndex] = useState(0);
+// Consistent date formatting helper using en-dash instead of em-dash
+function formatDate(dateStr?: string, isCurrent?: boolean): string {
+  if (isCurrent) return "Present";
+  if (!dateStr) return "Present";
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  } catch {
+    return dateStr;
+  }
+}
 
-  useEffect(() => {
-    if (initialData.length > 0) {
-      setCareers(initialData);
-    }
-  }, [initialData]);
+export default function CareerTimeline({
+  initialData = [],
+}: {
+  initialData?: CareerItem[];
+}) {
+  const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
 
+  if (!initialData || initialData.length === 0) return null;
 
-  // Group by Organization
-  const groupedCareers = useMemo(() => {
-    const groups: OrganizationGroup[] = [];
-    careers.forEach((item) => {
-      const lastGroup = groups[groups.length - 1];
-      if (lastGroup && lastGroup.organization === item.organization) {
-        lastGroup.roles.push(item);
-      } else {
-        groups.push({
-          organization: item.organization,
-          logo: item.logo,
-          roles: [item],
-        });
-      }
-    });
-    return groups;
-  }, [careers]);
-
-  // Auto-play Logic
-  useEffect(() => {
-    if (!groupedCareers.length) return;
-
-    const interval = setInterval(() => {
-      const currentGroup = groupedCareers[activeOrgIndex];
-      
-      // If there are more roles in the current group, go to next role
-      if (activeRoleIndex < currentGroup.roles.length - 1) {
-        setActiveRoleIndex((prev) => prev + 1);
-      } else {
-        // Otherwise, go to next group (and reset role to 0)
-        const nextOrgIndex = (activeOrgIndex + 1) % groupedCareers.length;
-        setActiveOrgIndex(nextOrgIndex);
-        setActiveRoleIndex(0);
-      }
-    }, 5000); // 5 seconds per item
-
-    return () => clearInterval(interval);
-  }, [groupedCareers, activeOrgIndex, activeRoleIndex]);
-
-  if (!groupedCareers.length) return null;
-
-  const activeGroup = groupedCareers[activeOrgIndex];
-  const activeRole = activeGroup.roles[activeRoleIndex];
-
-  const handleRestart = () => {
-    setActiveOrgIndex(0);
-    setActiveRoleIndex(0);
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handlePrev = () => {
-    const currentGroup = groupedCareers[activeOrgIndex];
-    if (activeRoleIndex > 0) {
-      setActiveRoleIndex(prev => prev - 1);
+  // Group roles by organization while preserving chronological progression
+  const sorted = [...initialData].sort((a, b) => {
+    const aTime = a.isCurrent ? Infinity : new Date(a.startDate).getTime();
+    const bTime = b.isCurrent ? Infinity : new Date(b.startDate).getTime();
+    return bTime - aTime;
+  });
+
+  const groupedList: OrganizationGroup[] = [];
+
+  sorted.forEach((item) => {
+    const existing = groupedList.find((g) => g.organization === item.organization);
+    if (existing) {
+      existing.roles.push(item);
+      if (item.isCurrent) existing.isCurrent = true;
     } else {
-      const prevOrgIndex = (activeOrgIndex - 1 + groupedCareers.length) % groupedCareers.length;
-      setActiveOrgIndex(prevOrgIndex);
-      setActiveRoleIndex(groupedCareers[prevOrgIndex].roles.length - 1);
+      groupedList.push({
+        organization: item.organization,
+        logo: item.logo,
+        roles: [item],
+        earliestDate: item.startDate,
+        latestDate: item.isCurrent ? "Present" : item.endDate || item.startDate,
+        isCurrent: !!item.isCurrent,
+      });
     }
-  };
-
-  const handleNext = () => {
-    const currentGroup = groupedCareers[activeOrgIndex];
-    if (activeRoleIndex < currentGroup.roles.length - 1) {
-      setActiveRoleIndex(prev => prev + 1);
-    } else {
-      const nextOrgIndex = (activeOrgIndex + 1) % groupedCareers.length;
-      setActiveOrgIndex(nextOrgIndex);
-      setActiveRoleIndex(0);
-    }
-  };
+  });
 
   return (
-    <section id="Career" className="w-full h-auto pt-12 pb-20 sm:pb-12 overflow-hidden relative flex flex-col justify-center">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10">
-        <div className="text-left mb-10 pl-4 lg:pl-0">
-          <h2 className="text-3xl sm:text-4xl font-bold text-[var(--primary)] mb-2">
-            My Journey
-          </h2>
-          <p className="text-[var(--muted-foreground)] max-w-2xl text-sm">
-            A timeline of my professional experience and education.
-          </p>
-        </div>
+    <section id="Career" className="w-full py-10 sm:py-14 scroll-mt-24">
+      <SectionHeader
+        eyebrow="Experience"
+        title="Career Journey"
+        subtitle="Professional progression across business analytics, web survey insights, and analytical leadership."
+      />
 
-        {/* Desktop View: Grid with Details and Dial */}
-        <div className="hidden lg:grid lg:grid-cols-2 gap-20 items-center p-4">
-          {/* LEFT: Details */}
-          <div className="relative z-10 h-full flex items-center">
-            <CareerDetails 
-              item={activeRole} 
-              roleIndex={activeRoleIndex} 
-              totalRoles={activeGroup.roles.length} 
-            />
-          </div>
+      {/* Vertical Timeline */}
+      <div className="max-w-4xl mx-auto relative">
+        {/* Timeline subtle guide line */}
+        <div
+          className="absolute left-4 sm:left-6 top-6 bottom-6 w-px bg-border/70"
+          aria-hidden="true"
+        />
 
-          {/* RIGHT: Dial */}
-          <div className="h-fit lg:h-full relative">
-             <CareerDial 
-               groups={groupedCareers} 
-               activeOrgIndex={activeOrgIndex} 
-               onOrgChange={(index) => {
-                 setActiveOrgIndex(index);
-                 setActiveRoleIndex(0);
-               }}
-             />
-          </div>
-        </div>
+        <div className="space-y-8 sm:space-y-10">
+          {groupedList.map((group, groupIdx) => {
+            const hasMultipleRoles = group.roles.length > 1;
 
-        {/* Mobile/Tablet View: Clean Boxes */}
-        <div className="lg:hidden flex flex-col gap-6 px-4">
-          {careers.slice().reverse().map((career) => (
-            <div 
-              key={career._id} 
-              className="bg-[var(--card)] border border-[var(--border)] p-6 rounded-3xl shadow-sm hover:border-[var(--primary)]/50 transition-all"
-            >
-              <div className="flex flex-col gap-3">
-                <div className="flex justify-between items-start">
-                  <span className="text-xs font-bold text-[var(--primary)] uppercase tracking-widest">
-                    {career.organization}
-                  </span>
-                  <span className="text-[10px] text-[var(--muted-foreground)] uppercase">
-                    {new Date(career.startDate).getFullYear()} - {career.isCurrent ? "Present" : career.endDate ? new Date(career.endDate).getFullYear() : ""}
-                  </span>
+            return (
+              <div key={groupIdx} className="relative flex items-start gap-4 sm:gap-6">
+                {/* Node icon */}
+                <div
+                  className={`relative z-10 flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full border transition-colors shrink-0 ${
+                    group.isCurrent
+                      ? "bg-foreground text-background border-foreground shadow-xs"
+                      : "bg-card text-muted-foreground border-border"
+                  }`}
+                >
+                  {group.roles[0]?.type === "education" ? (
+                    <GraduationCap size={15} />
+                  ) : (
+                    <Briefcase size={15} />
+                  )}
                 </div>
-                
-                <h3 className="text-xl font-bold text-[var(--foreground)]">
-                  {career.title}
-                </h3>
-                
-                {career.description && (
-                  <p className="text-sm text-[var(--muted-foreground)] leading-relaxed line-clamp-3">
-                    {career.description}
-                  </p>
-                )}
 
-                {career.skills && career.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {career.skills.slice(0, 4).map((skill) => (
-                      <span 
-                        key={skill} 
-                        className="px-2 py-0.5 text-[10px] rounded-md bg-[var(--background)] border border-[var(--border)] text-[var(--foreground)]"
-                      >
-                        {skill}
+                {/* Organization Card */}
+                <div className="flex-1 rounded-xl border border-border/70 bg-card text-card-foreground p-5 sm:p-6 overflow-hidden">
+                  {/* Employer Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-border/50">
+                    <div className="flex items-center gap-3">
+                      {group.logo?.asset && (
+                        <div className="relative w-7 h-7 rounded overflow-hidden bg-muted/40 shrink-0 border border-border/40">
+                          <Image
+                            src={urlFor(group.logo).width(56).height(56).url()}
+                            alt={group.organization}
+                            fill
+                            className="object-contain p-0.5"
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
+                          {group.organization}
+                        </h3>
+                        {hasMultipleRoles && (
+                          <span className="text-xs text-muted-foreground font-medium">
+                            {group.roles.length} Roles • Career Progression
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground self-start sm:self-center">
+                      <Calendar size={12} />
+                      <span>
+                        {formatDate(group.earliestDate)} to {formatDate(group.latestDate, group.isCurrent)}
                       </span>
-                    ))}
+                    </div>
                   </div>
-                )}
+
+                  {/* Roles progression */}
+                  <div className="space-y-5">
+                    {group.roles.map((role) => {
+                      const isExpanded = expandedIds[role._id];
+                      const dateRange = `${formatDate(role.startDate)} to ${formatDate(role.endDate, role.isCurrent)}`;
+
+                      return (
+                        <div
+                          key={role._id}
+                          className={hasMultipleRoles ? "pl-3.5 sm:pl-4 border-l-2 border-primary/25" : ""}
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                            <h4 className="text-sm sm:text-base font-semibold text-foreground">
+                              {role.title}
+                            </h4>
+                            <span className="text-xs text-muted-foreground font-medium">
+                              {dateRange}
+                            </span>
+                          </div>
+
+                          {role.description && (
+                            <div className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                              <p className={!isExpanded && role.description.length > 140 ? "line-clamp-2" : ""}>
+                                {role.description}
+                              </p>
+                              {role.description.length > 140 && (
+                                <button
+                                  onClick={() => toggleExpand(role._id)}
+                                  type="button"
+                                  className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+                                >
+                                  <span>{isExpanded ? "Show Less" : "Read More"}</span>
+                                  {isExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                                </button>
+                              )}
+                            </div>
+                          )}
+
+                          {role.skills && role.skills.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mt-2.5">
+                              {role.skills.map((skill) => (
+                                <span
+                                  key={skill}
+                                  className="px-2 py-0.5 text-[11px] font-medium bg-secondary text-secondary-foreground rounded border border-border/40"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-
-        {/* Desktop ONLY Manual Controls */}
-        <div className="hidden lg:flex absolute -bottom-6 sm:bottom-4 right-4 sm:right-4 items-center gap-2 z-50">
-          <button 
-            onClick={handleRestart}
-            className="px-3 py-1 bg-[var(--card)] border border-[var(--border)] rounded-full text-xs hover:bg-[var(--primary)] hover:text-white transition-colors"
-          >
-            Restart
-          </button>
-          
-          <button 
-            onClick={handlePrev}
-            className="p-2 bg-[var(--card)] border border-[var(--border)] rounded-full hover:bg-[var(--primary)] hover:text-white transition-colors"
-          >
-            ←
-          </button>
-
-          <button 
-            onClick={handleNext}
-            className="p-2 bg-[var(--card)] border border-[var(--border)] rounded-full hover:bg-[var(--primary)] hover:text-white transition-colors"
-          >
-            →
-          </button>
-        </div>
-
       </div>
     </section>
   );

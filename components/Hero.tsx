@@ -1,126 +1,103 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
-import { Button } from "./ui/moving-border";
-import NavLink from "./NavLink";
-import { motion, AnimatePresence } from "motion/react";
+import Link from "next/link";
+import { ArrowDown, Mail } from "lucide-react";
 import { urlFor } from "@/sanity/lib/image";
 import { HeroData } from "@/types";
 
-export default function Hero({ data }: { data?: HeroData }) {
-  const [index, setIndex] = useState(0);
+interface HeroProps {
+  data?: HeroData;
+}
 
-  useEffect(() => {
-    if (!data?.typewriterTexts?.length) return;
-    const interval = setInterval(() => {
-      setIndex((prev: number) => (prev + 1) % data!.typewriterTexts!.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [data?.typewriterTexts]);
-
+export default function Hero({ data }: HeroProps) {
   if (!data) return null;
 
-  const { name, typewriterTexts, tagline, profileImage } = data;
+  const { name, tagline, profileImage } = data;
 
-  const imageUrl =
-    profileImage?.asset?.url ??
-    (profileImage ? urlFor(profileImage).width(600).height(600).quality(100).auto("format").fit("max").url() : "/fallback.jpg");
+  // Generate crisp, high-resolution retina-ready image URL via Sanity CDN pipeline
+  let imageUrl: string | null = null;
+  if (profileImage) {
+    try {
+      imageUrl = urlFor(profileImage)
+        .width(800)
+        .height(800)
+        .quality(100)
+        .fit("crop")
+        .auto("format")
+        .url();
+    } catch {
+      imageUrl = profileImage.asset?.url || null;
+    }
+  }
 
-  const firstName = name?.split(" ")[0] || "Your";
-  const lastName = name?.split(" ").slice(1).join(" ") || "Name";
+  const headline = tagline || "Turning complex data into intelligent, actionable solutions.";
+  const professionalRole = "Lead Data Analyst";
+  const professionalSubhead =
+    "Lead Data Analyst exploring the intersection of Business Analytics, Machine Learning, and AI Engineering.";
 
   return (
-    <section className="w-full flex flex-col-reverse md:flex-row items-center justify-between gap-6 md:gap-12">
-      
-      {/* 📝 Left Column: Text Content */}
-      <motion.div
-        className="flex flex-col gap-9 text-center md:text-left max-w-xl"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <h1 className="leading-tight flex flex-col gap-1">
-          {/* <span className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground transition-colors">
-            Architecting High-Performance Web Experiences.
-          </span> */}
-          <span className="text-xl md:text-2xl text-muted-foreground font-medium mt-2">
-            Hi, I'm <span className="text-[var(--accent)]">{firstName}</span> {lastName}.
+    <section 
+      aria-label="Introduction" 
+      className="w-full pt-6 pb-6 sm:pt-10 sm:pb-10 flex flex-col items-center justify-center text-center"
+    >
+      <div className="max-w-3xl mx-auto flex flex-col items-center">
+        {/* 1. Understated Professional Eyebrow with Blinking Blue Dot */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 mb-5 rounded-full text-xs font-semibold tracking-wide bg-secondary text-muted-foreground border border-border/60">
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
           </span>
-        </h1>
-
-        <div className="relative h-24 sm:h-20 md:h-24 overflow-hidden text-xl md:text-2xl text-secondary font-semibold">
-          {typewriterTexts?.length ? (
-            <AnimatePresence mode="popLayout">
-              <motion.div
-                key={index}
-                initial={{ y: 40, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -40, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="w-full"
-              >
-                {typewriterTexts[index]}
-              </motion.div>
-            </AnimatePresence>
-          ) : (
-            <p>{tagline}</p>
-          )}
+          <span>{name || "Kishore Shanmugam"} • {professionalRole}</span>
         </div>
 
-        {tagline && (
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            {tagline}
-          </p>
+        {/* 2. Profile Photograph (+35% larger, positioned directly after name & role eyebrow) */}
+        {imageUrl && (
+          <div className="relative mb-6">
+            <div className="relative w-32 h-32 sm:w-[152px] sm:h-[152px] rounded-full overflow-hidden border-2 border-border/80 shadow-md bg-muted">
+              <Image
+                src={imageUrl}
+                alt={profileImage?.alt || `${name || "Kishore"} Profile`}
+                fill
+                sizes="(max-width: 640px) 256px, 304px"
+                quality={95}
+                priority
+                className="object-cover"
+              />
+            </div>
+          </div>
         )}
 
-        <div className="flex flex-wrap justify-center md:justify-start gap-4">
-          <Button
-            borderRadius="1.75rem"
-            className="bg-background text-foreground border-neutral-200 dark:border-slate-800 font-semibold"
-          >
-            <NavLink href="#Contact">Contact Me</NavLink>
-          </Button>
-          <Button
-            borderRadius="1.75rem"
-            className="bg-background text-foreground border-neutral-200 dark:border-slate-800 font-semibold"
-          >
-            <NavLink href="#Projects">My Projects</NavLink>
-          </Button>
-        </div>
-      </motion.div>
+        {/* 3. Headline (Reduced, elegant editorial font size for balanced hierarchy) */}
+        <h1 className="text-2xl sm:text-3xl md:text-[40px] font-bold tracking-tight text-foreground leading-[1.2] max-w-2xl mb-3 sm:mb-4">
+          {headline}
+        </h1>
 
-      {/* 🖼️ Right Column: Image */}
-      <motion.div
-        className="relative"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.7, delay: 0.2 }}
-      >
-        <div
-          className="
-            relative 
-            w-[300px] h-[300px] 
-            md:w-[450px] md:h-[450px]
-            rounded-full 
-            overflow-hidden 
-            border-4 border-background 
-            shadow-2xl
-            hover:scale-105 transition-transform duration-500
-          "
-        >
-          <Image
-            src={imageUrl}
-            alt={profileImage?.alt || `${name} profile`}
-            fill
-            className="object-cover"
-            priority
-            quality={100}
-            unoptimized
-            sizes="(max-width: 768px) 280px, 400px"
-          />
+        {/* 4. Subhead */}
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-lg font-normal mb-7">
+          {professionalSubhead}
+        </p>
+
+        {/* 5. Primary & Secondary CTAs */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <Link
+            href="#Projects"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-foreground text-background hover:opacity-90 active:scale-[0.98] transition-all shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <span>Explore Projects</span>
+            <ArrowDown size={14} />
+          </Link>
+
+          <Link
+            href="#Contact"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-secondary hover:bg-muted text-foreground border border-border/80 active:scale-[0.98] transition-all shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <span>Contact Me</span>
+            <Mail size={14} />
+          </Link>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

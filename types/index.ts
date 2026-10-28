@@ -8,8 +8,21 @@ export interface SanityImage {
   asset?: {
     url?: string
     _ref?: string
+    _id?: string
   }
   alt?: string
+  crop?: {
+    top: number
+    bottom: number
+    left: number
+    right: number
+  }
+  hotspot?: {
+    x: number
+    y: number
+    height: number
+    width: number
+  }
 }
 
 // 📂 Project

@@ -1,11 +1,11 @@
 // /schemas/blockContentType.ts
 import { defineType, defineArrayMember, defineField } from 'sanity'
-import { ImageIcon, CodeIcon } from '@sanity/icons'
+import { ImageIcon, CodeIcon, BarChartIcon } from '@sanity/icons'
 import { PiMathOperationsBold } from 'react-icons/pi'
 
 /**
  * Extended Block Content Schema
- * - Supports rich text, code, callouts, video embeds, tables, and LaTeX (block + inline)
+ * - Supports rich text, code, callouts, video embeds, tables, charts, and LaTeX (block + inline)
  */
 
 export const blockContentType = defineType({
@@ -143,6 +143,12 @@ export const blockContentType = defineType({
       name: 'table',
       title: 'Table',
       type: 'table',
+    }),
+
+    // 📈 Interactive Charts
+    defineArrayMember({
+      type: 'chart',
+      icon: BarChartIcon,
     }),
 
     // 🧮 LaTeX Block Formulas

@@ -1,12 +1,25 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { PortableText, PortableTextComponents, PortableTextMarkComponentProps } from '@portabletext/react'
 import { urlFor } from '@/sanity/lib/image'
 import Image from 'next/image'
 import { useTheme } from 'next-themes'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
+
+import CopyButton from '@/components/ui/CopyButton'
+
+// Lazy-load ChartRenderer to ensure zero Recharts bundle overhead on pages without charts
+const ChartRenderer = dynamic(() => import('@/components/charts/ChartRenderer'), {
+  ssr: false,
+  loading: () => (
+    <div className="my-8 h-[320px] rounded-2xl border border-border/60 bg-muted/20 animate-pulse flex items-center justify-center text-xs text-muted-foreground">
+      Loading interactive visualization...
+    </div>
+  ),
+})
 
 const preprocessMath = (blocks: any[]): any[] => {
   if (!Array.isArray(blocks)) return blocks
@@ -95,19 +108,18 @@ const CustomPortableText = ({ value }: { value: any }) => {
 
         return (
           <figure className="my-10 text-center w-full group">
-            <div className="overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 hover:scale-[1.01] bg-muted/5">
+            <div className="overflow-hidden rounded-2xl shadow-md border border-border/60 bg-muted/10">
               <Image
-                src={urlFor(value).width(2400).quality(100).fit('max').auto('format').url()}
-                alt={value.alt || 'Image'}
+                src={urlFor(value).width(1600).quality(85).fit('max').auto('format').url()}
+                alt={value.alt || 'Illustration'}
                 width={width}
                 height={height}
-                quality={100}
-                unoptimized
-                className="object-contain w-full h-auto max-h-[80vh]"
+                sizes="(max-width: 768px) 100vw, 800px"
+                className="object-contain w-full h-auto max-h-[75vh]"
               />
             </div>
             {value.caption && (
-              <figcaption className="text-sm text-[var(--muted-foreground)] mt-3 italic tracking-wide">
+              <figcaption className="text-xs text-muted-foreground mt-3 italic tracking-wide">
                 {value.caption}
               </figcaption>
             )}
@@ -115,22 +127,30 @@ const CustomPortableText = ({ value }: { value: any }) => {
         )
       },
 
+      chart: ({ value }: { value: any }) => {
+        if (!value) return null
+        return <ChartRenderer {...value} />
+      },
+
       codeBlock: ({ value }: { value: any }) => (
-        <div className="not-prose my-10 rounded-xl overflow-hidden shadow-2xl border border-[var(--border)] bg-[#282c34]">
-          <div className="flex items-center justify-between px-4 py-2 bg-[#21252b] border-b border-white/10">
-            <div className="flex space-x-2">
-              <div className="w-3 h-3 rounded-full bg-red-500/80" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-              <div className="w-3 h-3 rounded-full bg-green-500/80" />
+        <div className="not-prose my-8 rounded-2xl overflow-hidden shadow-lg border border-border/80 bg-[#16181d]">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-[#1e222b] border-b border-white/10">
+            <div className="flex items-center gap-3">
+              <div className="flex space-x-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+              </div>
+              {value.filename && (
+                <span className="text-xs text-neutral-400 font-mono">
+                  {value.filename}
+                </span>
+              )}
             </div>
-            {value.filename && (
-              <span className="text-xs text-gray-400 font-mono opacity-80">
-                {value.filename}
-              </span>
-            )}
+            <CopyButton text={value.code || ""} />
           </div>
           <div 
-            className="p-6 text-sm overflow-x-auto text-gray-100 [&>pre]:!bg-transparent [&>pre]:m-0 [&>pre]:p-0 [&_code]:!bg-transparent" 
+            className="p-5 text-sm overflow-x-auto text-neutral-100 font-mono [&>pre]:!bg-transparent [&>pre]:m-0 [&>pre]:p-0 [&_code]:!bg-transparent" 
             dangerouslySetInnerHTML={{ __html: value.html || `<pre><code>${value.code}</code></pre>` }} 
           />
         </div>

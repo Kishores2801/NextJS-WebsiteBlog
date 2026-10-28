@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { Award, ExternalLink } from "lucide-react";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
+import SectionHeader from "@/components/ui/SectionHeader";
 
-interface Certification {
+export interface Certification {
   title: string;
   issuer: string;
   date: string;
@@ -15,107 +16,117 @@ interface Certification {
   categories?: string[];
 }
 
-export default function Certifications() {
-  const [certs, setCerts] = useState<Certification[]>([]);
+interface CertificationsProps {
+  initialData?: Certification[];
+}
+
+export default function Certifications({ initialData }: CertificationsProps) {
+  const [certs, setCerts] = useState<Certification[]>(initialData || []);
 
   useEffect(() => {
+    if (initialData && initialData.length > 0) {
+      setCerts(initialData);
+      return;
+    }
+
     const fetchCerts = async () => {
-      const data = await client.fetch(`
-        *[_type == "certification" && featured == true] | order(date desc) {
-          title,
-          issuer,
-          date,
-          logo,
-          credentialLink,
-          categories
-        }
-      `);
-      setCerts(data);
+      try {
+        const data = await client.fetch(`
+          *[_type == "certification" && featured == true] | order(date desc) {
+            title,
+            issuer,
+            date,
+            logo,
+            credentialLink,
+            categories
+          }
+        `);
+        setCerts(data);
+      } catch (err) {
+        console.error("Failed to load certifications:", err);
+      }
     };
 
     fetchCerts();
-  }, []);
+  }, [initialData]);
 
-  if (!certs.length) return null;
+  if (!certs || certs.length === 0) return null;
 
   return (
-    <section id="Certifications" className="max-w-6xl mx-auto px-6 py-14">
-      
-      {/* Heading */}
-      <h2 className="text-3xl font-bold text-center text-[var(--color-primary)] mb-6">
-        Certifications
-      </h2>
+    <section id="Certifications" className="w-full py-10 sm:py-14 scroll-mt-24">
+      {/* Section Header */}
+      <SectionHeader
+        eyebrow="Credentials"
+        title="Verified Certifications"
+        subtitle="Professional credentials and specialized accreditations reinforcing core domain proficiency."
+      />
 
-      <p className="text-center text-sm sm:text-base text-[var(--muted-foreground)] max-w-2xl mx-auto mb-10">
-        A curated list of certifications that reflect my ongoing learning,
-        professional development, and commitment to mastering core technologies.
-      </p>
-
-      {/* Certifications Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
         {certs.map((cert, idx) => (
-          <motion.div
+          <div
             key={idx}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: idx * 0.1 }}
-            viewport={{ once: true }}
-            className="bg-[var(--card)] border border-[var(--border)] opacity-25 rounded-xl p-6 shadow hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center"
+            className="rounded-xl border border-border/70 bg-card text-card-foreground p-5 sm:p-6 flex flex-col justify-between text-left"
           >
-            {/* Logo */}
-            {cert.logo && (
-              <div className="relative w-16 h-16 mb-4">
-                <Image
-  src={urlFor(cert.logo).width(200).height(200).url()}
-  alt={cert.title}
-  width={200}
-  height={200}
-  className="object-contain"
-/>
-              </div>
-            )}
+            <div>
+              <div className="flex items-start justify-between gap-4 mb-4">
+                {cert.logo?.asset ? (
+                  <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-muted/30 border border-border/50 shrink-0 p-1">
+                    <Image
+                      src={urlFor(cert.logo).width(96).height(96).url()}
+                      alt={cert.title}
+                      fill
+                      className="object-contain p-1"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center text-primary border border-border/50 shrink-0">
+                    <Award size={22} />
+                  </div>
+                )}
 
-            {/* Title */}
-            <h3 className="text-lg font-semibold text-[var(--foreground)] mb-1">
-              {cert.title}
-            </h3>
-
-            {/* Issuer */}
-            <p className="text-sm text-[var(--muted-foreground)] mb-1">
-              {cert.issuer}
-            </p>
-
-            {/* Year */}
-            <p className="text-xs text-[var(--muted-foreground)] mb-4">
-              {cert.date}
-            </p>
-
-            {/* Categories */}
-            {cert.categories && cert.categories.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-2 mb-4">
-                {cert.categories.map((cat, i) => (
-                  <span
-                    key={i}
-                    className="px-2 py-[2px] text-xs rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] border border-[var(--color-primary)]"
-                  >
-                    {cat}
+                {cert.date && (
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-secondary text-muted-foreground border border-border/40">
+                    {cert.date}
                   </span>
-                ))}
+                )}
+              </div>
+
+              <h3 className="text-lg font-bold tracking-tight text-foreground mb-1">
+                {cert.title}
+              </h3>
+
+              <p className="text-sm font-medium text-muted-foreground mb-4">
+                {cert.issuer}
+              </p>
+
+              {cert.categories && cert.categories.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-6">
+                  {cert.categories.map((cat, i) => (
+                    <span
+                      key={i}
+                      className="px-2 py-0.5 text-[11px] font-medium rounded-md bg-secondary text-secondary-foreground border border-border/40"
+                    >
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {cert.credentialLink && (
+              <div className="pt-4 border-t border-border/50">
+                <a
+                  href={cert.credentialLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                >
+                  <span>Verify Credential</span>
+                  <ExternalLink size={12} />
+                </a>
               </div>
             )}
-
-            {/* Credential Link */}
-            {cert.credentialLink && (
-              <a
-                href={cert.credentialLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-medium text-[var(--color-primary)] hover:underline"
-              >
-                View Credential
-              </a>
-            )}
-          </motion.div>
+          </div>
         ))}
       </div>
     </section>
