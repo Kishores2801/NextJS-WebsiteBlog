@@ -198,7 +198,11 @@
   @apply border-l-4 border-primary pl-4 italic text-muted-foreground;
 }
 .prose code {
-  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-secondary;
+  @apply bg-muted px-1.5 py-0.5 rounded-md text-sm font-mono text-primary border border-border;
+}
+.prose code::before,
+.prose code::after {
+  content: "" !important;
 }
 
 /* 🔢 KaTeX / Math Adjustments */

@@ -361,7 +361,7 @@ const CustomPortableText = ({ value }: { value: any }) => {
         <span className="underline decoration-[var(--color-accent)] decoration-2 underline-offset-2">{children}</span>
       ),
       code: ({ children }: { children?: React.ReactNode }) => (
-        <code className="bg-[var(--muted)] text-[var(--color-primary)] px-1.5 py-0.5 rounded-md text-sm font-mono border border-[var(--border)]">
+        <code className="bg-muted text-primary px-1.5 py-0.5 rounded-md text-sm font-mono border border-border">
           {children}
         </code>
       ),
