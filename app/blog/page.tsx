@@ -5,11 +5,11 @@ import BlogGallery from "@/components/BlogGallery";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 export const metadata: Metadata = {
-  title: "Engineering Blog & Technical Insights | Kishore Shanmugam",
+  title: "My Blog Post & Technical Insights | Kishore Shanmugam",
   description:
     "Articles, tutorials, and algorithmic deep dives on data mining, machine learning, and analytics engineering by Kishore Shanmugam.",
   openGraph: {
-    title: "Engineering Blog & Technical Insights | Kishore Shanmugam",
+    title: "My Blog Post & Technical Insights | Kishore Shanmugam",
     description: "Data mining, machine learning, and analytics engineering articles.",
   },
 };
@@ -54,7 +54,7 @@ export default async function BlogPage() {
       {/* Header */}
       <SectionHeader
         eyebrow="Journal"
-        title="Engineering Blog"
+        title="My Blog Post"
         subtitle="Technical articles, algorithmic teardowns, and mathematical principles behind intelligent systems and business analytics."
       />
 

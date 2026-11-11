@@ -133,7 +133,7 @@ export default function BlogPreview({ posts = [] }: BlogPreviewProps) {
           href="/blog"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold bg-secondary hover:bg-muted text-foreground border border-border/70 hover:border-border transition-all shadow-xs group"
         >
-          <span>Visit Engineering Blog</span>
+          <span>Visit My Blog Post</span>
           <ArrowRight
             size={15}
             className="transition-transform group-hover:translate-x-1"

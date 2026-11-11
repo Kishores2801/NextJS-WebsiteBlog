@@ -22,10 +22,10 @@ export async function generateMetadata({ params }: Props) {
 
   if (!post) return { title: 'Post Not Found' }
   return {
-    title: `${post.title} | Engineering Blog`,
+    title: `${post.title} | My Blog Post`,
     description: post.excerpt,
     openGraph: {
-      title: `${post.title} | Engineering Blog`,
+      title: `${post.title} | My Blog Post`,
       description: post.excerpt,
       images: post.mainImage?.asset
         ? [urlFor(post.mainImage).width(1200).height(630).url()]
@@ -114,7 +114,7 @@ export default async function BlogPost({ params }: Props) {
       {/* 🧭 Breadcrumb */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-muted-foreground mb-8">
         <Link href="/blog" className="hover:text-foreground transition-colors">
-          Engineering Blog
+          My Blog Post
         </Link>
         <ChevronRight size={12} />
         <span className="text-foreground line-clamp-1">{post.title}</span>

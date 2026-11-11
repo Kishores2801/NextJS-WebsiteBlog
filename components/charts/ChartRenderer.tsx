@@ -180,17 +180,39 @@ export default function ChartRenderer(props: ChartProps) {
           return { data: [], keys: [], parseError: "CSV must include a header line and at least one data row." };
         }
 
-        const headers = lines[0].split(",").map((h) => h.trim().replace(/^["']|["']$/g, ""));
+        // Robust CSV line parser that respects quotes containing commas
+        const parseLine = (line: string): string[] => {
+          const cells: string[] = [];
+          let current = "";
+          let inQuotes = false;
+          for (let c = 0; c < line.length; c++) {
+            const char = line[c];
+            if (char === '"' || char === "'") {
+              inQuotes = !inQuotes;
+            } else if (char === "," && !inQuotes) {
+              cells.push(current.trim().replace(/^["']|["']$/g, ""));
+              current = "";
+            } else {
+              current += char;
+            }
+          }
+          cells.push(current.trim().replace(/^["']|["']$/g, ""));
+          return cells;
+        };
+
+        const headers = parseLine(lines[0]);
         const parsedRows: Record<string, string | number>[] = [];
 
         for (let i = 1; i < lines.length; i++) {
-          const cells = lines[i].split(",").map((c) => c.trim().replace(/^["']|["']$/g, ""));
+          const cells = parseLine(lines[i]);
           const rowObj: Record<string, string | number> = {};
 
           headers.forEach((hdr, idx) => {
             const rawVal = cells[idx] ?? "";
-            const numVal = Number(rawVal);
-            rowObj[hdr] = !isNaN(numVal) && rawVal !== "" ? numVal : rawVal;
+            // Clean value: strip currency symbols, commas, trailing percent sign, or spaces
+            const cleanedNumStr = rawVal.replace(/[$,]/g, "").replace(/%$/, "").trim();
+            const numVal = Number(cleanedNumStr);
+            rowObj[hdr] = !isNaN(numVal) && cleanedNumStr !== "" ? numVal : rawVal;
           });
 
           parsedRows.push(rowObj);
@@ -217,6 +239,16 @@ export default function ChartRenderer(props: ChartProps) {
     const available = Object.keys(data[0]);
     return available.find((k) => k.toLowerCase() === xAxisKey.toLowerCase()) || available[0];
   }, [data, xAxisKey]);
+
+  // Dynamic YAxis width for horizontal bar charts to avoid clipping category labels
+  const categoryAxisWidth = useMemo(() => {
+    if (chartType !== "horizontal-bar" || data.length === 0) return 90;
+    const maxLen = data.reduce(
+      (max, d) => Math.max(max, String(d[activeXAxisKey] || "").length),
+      0
+    );
+    return Math.min(170, Math.max(90, Math.round(maxLen * 7.2 + 24)));
+  }, [chartType, data, activeXAxisKey]);
 
   // Format Value Helper
   const formatValue = (val: unknown) => {
@@ -285,22 +317,30 @@ export default function ChartRenderer(props: ChartProps) {
         <div style={{ height: `${height}px`, width: "100%" }} className="w-full relative">
           <ResponsiveContainer width="100%" height="100%">
             {chartType === "horizontal-bar" ? (
-              <BarChart data={data} layout="vertical" margin={{ top: 10, right: 20, left: 20, bottom: 10 }}>
+              <BarChart
+                data={data}
+                layout="vertical"
+                margin={{ top: 10, right: 30, left: 10, bottom: yAxisLabel ? 25 : 10 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={gridStroke} />
                 <XAxis
                   type="number"
                   stroke={axisColor}
                   tick={{ fontSize: 11 }}
                   tickFormatter={formatValue}
-                  domain={[yAxisMin ?? "auto", yAxisMax ?? "auto"]}
-                  label={xAxisLabel ? { value: xAxisLabel, position: "insideBottom", offset: -5 } : undefined}
+                  domain={[yAxisMin !== undefined ? yAxisMin : 0, yAxisMax ?? "auto"]}
+                  label={
+                    yAxisLabel
+                      ? { value: yAxisLabel, position: "insideBottom", offset: -5 }
+                      : undefined
+                  }
                 />
                 <YAxis
                   type="category"
                   dataKey={activeXAxisKey}
                   stroke={axisColor}
                   tick={{ fontSize: 11 }}
-                  width={90}
+                  width={categoryAxisWidth}
                 />
                 {showTooltip && (
                   <Tooltip content={<CustomTooltip valuePrefix={valuePrefix} valueSuffix={valueSuffix} />} />
@@ -313,7 +353,15 @@ export default function ChartRenderer(props: ChartProps) {
                     name={customSeries?.[idx]?.name || k}
                     fill={customSeries?.[idx]?.color || palette[idx % palette.length]}
                     radius={[0, 4, 4, 0]}
-                  />
+                  >
+                    {colorPalette === "multi" &&
+                      data.map((_, itemIdx) => (
+                        <Cell
+                          key={`cell-${itemIdx}`}
+                          fill={palette[itemIdx % palette.length]}
+                        />
+                      ))}
+                  </Bar>
                 ))}
               </BarChart>
             ) : chartType === "line" ? (
@@ -440,7 +488,10 @@ export default function ChartRenderer(props: ChartProps) {
               </ScatterChart>
             ) : (
               /* Default: Vertical Bar Chart */
-              <BarChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+              <BarChart
+                data={data}
+                margin={{ top: 10, right: 20, left: 0, bottom: xAxisLabel ? 25 : 10 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
                 <XAxis
                   dataKey={activeXAxisKey}
@@ -452,7 +503,7 @@ export default function ChartRenderer(props: ChartProps) {
                   stroke={axisColor}
                   tick={{ fontSize: 11 }}
                   tickFormatter={formatValue}
-                  domain={[yAxisMin ?? "auto", yAxisMax ?? "auto"]}
+                  domain={[yAxisMin !== undefined ? yAxisMin : 0, yAxisMax ?? "auto"]}
                   label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft" } : undefined}
                 />
                 {showTooltip && (
@@ -466,7 +517,15 @@ export default function ChartRenderer(props: ChartProps) {
                     name={customSeries?.[idx]?.name || k}
                     fill={customSeries?.[idx]?.color || palette[idx % palette.length]}
                     radius={[4, 4, 0, 0]}
-                  />
+                  >
+                    {colorPalette === "multi" &&
+                      data.map((_, itemIdx) => (
+                        <Cell
+                          key={`cell-${itemIdx}`}
+                          fill={palette[itemIdx % palette.length]}
+                        />
+                      ))}
+                  </Bar>
                 ))}
               </BarChart>
             )}

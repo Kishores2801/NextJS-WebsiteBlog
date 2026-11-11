@@ -198,12 +198,14 @@ export const chartType = defineType({
     }),
     defineField({
       name: 'yAxisMin',
-      title: 'Y-Axis Minimum (Optional)',
+      title: 'Value Axis Minimum (Optional)',
+      description: 'Minimum value on the numeric scale. Defaults to 0 for bar charts.',
       type: 'number',
     }),
     defineField({
       name: 'yAxisMax',
-      title: 'Y-Axis Maximum (Optional)',
+      title: 'Value Axis Maximum (Optional)',
+      description: 'Maximum value on the numeric scale. Defaults to auto (fits highest data point).',
       type: 'number',
     }),
 
